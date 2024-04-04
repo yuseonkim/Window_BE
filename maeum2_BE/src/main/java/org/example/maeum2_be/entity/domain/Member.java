@@ -37,10 +37,10 @@ public class Member {
     @Column(nullable = false)
     private String phoneNumber;
 
-    @Builder
+    @Column(nullable = false)
+    private String aiName;
 
-
-
-
+    @Column(nullable = false, columnDefinition = "NotUser")
+    private Role role;
 
 }
