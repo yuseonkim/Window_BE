@@ -7,12 +7,12 @@
         <processorPath useClasspath="false">
           <entry name="$USER_HOME$/.gradle/caches/modules-2/files-2.1/org.projectlombok/lombok/1.18.30/f195ee86e6c896ea47a1d39defbe20eb59cd149d/lombok-1.18.30.jar" />
         </processorPath>
-        <module name="maeum2_BE.maeum2_BE.main" />
+        <module name="maeum2_BE.maeum2_BE.main~1" />
       </profile>
     </annotationProcessing>
     <bytecodeTargetLevel>
-      <module name="maeum2_BE.maeum2_BE.main~1" target="17" />
-      <module name="maeum2_BE.maeum2_BE.test~1" target="17" />
+      <module name="maeum2_BE.maeum2_BE.main" target="17" />
+      <module name="maeum2_BE.maeum2_BE.test" target="17" />
     </bytecodeTargetLevel>
   </component>
 </project>
