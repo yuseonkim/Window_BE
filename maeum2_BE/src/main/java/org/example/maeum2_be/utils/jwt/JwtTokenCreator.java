@@ -1,40 +1,39 @@
 package org.example.maeum2_be.utils.jwt;
 
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import lombok.extern.slf4j.Slf4j;
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.algorithms.Algorithm;
+import lombok.RequiredArgsConstructor;
 import org.example.maeum2_be.entity.domain.Member;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
-import java.security.Key;
+import java.util.Date;
 
-@Slf4j
 @Component
+@RequiredArgsConstructor
 public class JwtTokenCreator {
+    @Value("${jwt.expiration-time}")
+    @Value("${openAI.model}")
+    private final Long accessEXP;
 
-    private final Key key;
-    private final long accessTokenExpiredTime;
+    private static String SECRET;
 
-    public JwtTokenCreator(
-            @Value("${jwt.secret}") String secretKey,
-            @Value("${jwt.expiration_time}") Long expireTime
-    ){
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        this.key = Keys.hmacShaKeyFor(keyBytes);
-        this.accessTokenExpiredTime = expireTime;
+    @Value("${jwt.secret}")
+    public void setSecret(String secret) {
+        SECRET = secret;
     }
+    public static String TOKEN_PREFIX = "Bearer ";
 
-    public String createAccessToken(Member member){
-        return createToken(accessTokenExpiredTime,member);
+
+    public String execute(Member member) {
+        String jwt = JWT.create()
+                .withExpiresAt(new Date(System.currentTimeMillis() + accessEXP * 1000))
+                .withClaim("memberId", member.getMemberId().toString())
+                .withClaim("childFirstName", member.getChildFirstName())
+                .withClaim("childLastName", member.getChildLastName())
+                .withClaim("aiName", member.getAiName())
+                .withClaim("role", member.getRole().toString())
+                .sign(Algorithm.HMAC512(SECRET));
+        return TOKEN_PREFIX + jwt;
     }
-
-    private String createToken(long accessTokenExpiredTime, Member member) {
-        Claims claims = Jwts.claims();
-        claims.put("memberId",customUserInfoDTO.getMemberId());
-        claims.put("memberId",)
-    }
-
 }

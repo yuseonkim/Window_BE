@@ -16,7 +16,7 @@ import java.util.Date;
 @Table
 public class Member {
     @Id
-    private Long memberId;
+    private String memberId;
 
     @Column(nullable = false, length = 20)
     private String childFirstName;
@@ -37,10 +37,23 @@ public class Member {
     @Column(nullable = false)
     private String phoneNumber;
 
+    @Column(nullable = true)
+    private String aiName;
+
+    @Column(nullable = false, columnDefinition = "NotUser")
+    private Role role;
+
+
+
     @Builder
-
-
-
-
+    public Member(String memberId, String childFirstName, String childLastName, Gender childGender, Date birth, String email, String phoneNumber){
+        this.memberId = memberId;
+        this.childFirstName = childFirstName;
+        this.childLastName = childLastName;
+        this.childGender = childGender;
+        this.birth = birth;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+    }
 
 }
