@@ -14,7 +14,7 @@ import org.springframework.web.client.RestTemplate;
 import java.util.Map;
 
 @Component
-public class KakaoOAuth2Service implements OAuth2Service{
+public class KakaoOAuth2Service implements OAuth2Interface {
     @Value("${oauth2.kakao.redirect-uri}")
     private String KAKAO_REDIRECT_URI;
     @Value("${oauth2.kakao.client-id}")

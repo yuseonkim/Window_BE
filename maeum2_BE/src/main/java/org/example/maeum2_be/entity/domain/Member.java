@@ -18,23 +18,23 @@ public class Member {
     @Id
     private String memberId;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     private String childFirstName;
 
-    @Column(nullable = false, length = 20)
+    @Column(nullable = true, length = 20)
     private String childLastName;
 
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Gender childGender;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private Date birth;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String email;
 
-    @Column(nullable = false)
+    @Column(nullable = true)
     private String phoneNumber;
 
     @Column(nullable = true)
@@ -46,7 +46,7 @@ public class Member {
 
 
     @Builder
-    public Member(String memberId, String childFirstName, String childLastName, Gender childGender, Date birth, String email, String phoneNumber){
+    public Member(String memberId, String childFirstName, String childLastName, Gender childGender, Date birth, String email, String phoneNumber, String aiName, Role role){
         this.memberId = memberId;
         this.childFirstName = childFirstName;
         this.childLastName = childLastName;
@@ -54,6 +54,21 @@ public class Member {
         this.birth = birth;
         this.email = email;
         this.phoneNumber = phoneNumber;
+        this.aiName = aiName;
+    }
+
+    @Builder
+    public Member(String memberId, String childLastName, String childFirstName, String aiName, Role role){
+        this.memberId = memberId;
+        this.childLastName = childLastName;
+        this.childFirstName = childFirstName;
+        this.aiName = aiName;
+        this.role = role;
+    }
+
+    @Builder
+    public Member(String memberId){
+        this.memberId = memberId;
     }
 
 }

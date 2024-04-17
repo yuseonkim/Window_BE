@@ -49,7 +49,7 @@ public class PrincipalDetails implements UserDetails {
     return member.getChildFirstName();
   }
 
-  public Long getMemberId() {
+  public String getMemberId() {
     return member.getMemberId();
   }
 

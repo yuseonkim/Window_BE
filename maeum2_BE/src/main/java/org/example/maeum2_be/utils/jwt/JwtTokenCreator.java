@@ -13,15 +13,11 @@ import java.util.Date;
 @RequiredArgsConstructor
 public class JwtTokenCreator {
     @Value("${jwt.expiration-time}")
-    @Value("${openAI.model}")
-    private final Long accessEXP;
-
-    private static String SECRET;
+    private static Long accessEXP;
 
     @Value("${jwt.secret}")
-    public void setSecret(String secret) {
-        SECRET = secret;
-    }
+    private static String SECRET;
+
     public static String TOKEN_PREFIX = "Bearer ";
 
 
