@@ -1,18 +1,18 @@
 package org.example.maeum2_be.service.oauth2;
 
-public class GoogleOAuth2Service implements OAuth2Service{
-    @Override
-    public void getAccessToken() {
+import org.example.maeum2_be.dto.KakaoProfileDTO;
+import org.springframework.stereotype.Service;
 
+@Service
+
+public class GoogleOAuth2Service implements OAuth2Interface {
+    @Override
+    public String getAccessToken(String code) {
+        return null;
     }
 
     @Override
-    public void getUserInfo() {
-
-    }
-
-    @Override
-    public void createUser() {
-
+    public KakaoProfileDTO getUserInfo(String accessToken) {
+        return null;
     }
 }

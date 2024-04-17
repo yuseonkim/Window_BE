@@ -8,6 +8,9 @@ public enum MessageCode {
   INVALID_LAST_POST_ID_PARAMETER("400", "lastPostId 파라미터는 0보다 커야합니다."),
   USER_NOT_AUTHENTICATED("401", "유저가 인증되지 않았습니다."),
   NEED_LOGIN("401", "로그인이 필요합니다."),
+
+  NEED_REGISTER("401", "회원가입이 필요합니다"),
+
   INVALIDATE_ACCESS_TOKEN("401", "잘못된 엑세스 토큰입니다."),
 
   EXPIRED_ACCESS_TOKEN("4111", "만료된 토큰입니다."),

@@ -40,12 +40,12 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
     }
     try {
       DecodedJWT decodedJWT = JwtTokenVerifier.execute(jwt);
-      Long memberId = Long.valueOf(decodedJWT.getClaim("memberId").asString());
-      String kakaoId = decodedJWT.getClaim("kakaoId").asString();
-      String userName = decodedJWT.getClaim("username").asString();
-      String instaId = decodedJWT.getClaim("instaId").asString();
+      String memberId = decodedJWT.getClaim("memberId").asString();
+      String childFirstName = decodedJWT.getClaim("childFirstName").asString();
+      String childLastName = decodedJWT.getClaim("childLastName").asString();
+      String aiName = decodedJWT.getClaim("aiName").asString();
       Role role = Role.valueOf(decodedJWT.getClaim("role").asString());
-      Member member = Member.builder().userName(userName).kakaoId(kakaoId).role(role).instaId(instaId).memberId(memberId).build();
+      Member member = Member.builder().childFirstName(childFirstName).memberId(memberId).childLastName(childLastName).aiName(aiName).role(role).build();
       System.out.println("member :" + member);
       PrincipalDetails myUserDetails = new PrincipalDetails(member);
       Authentication authentication =

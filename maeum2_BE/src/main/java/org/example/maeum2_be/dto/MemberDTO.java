@@ -1,4 +1,4 @@
-package org.example.maeum2_be.entity;
+package org.example.maeum2_be.dto;
 
 import lombok.Getter;
 
