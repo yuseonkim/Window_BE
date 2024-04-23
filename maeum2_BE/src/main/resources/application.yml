@@ -1,7 +1,8 @@
 spring:
   profiles:
-    active:
+    active: dev
 
 jwt :
-  expiration_time : 86400
+  expiration-time : 86400
   secret : ohmygodthisisjson
+

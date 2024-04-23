@@ -12,19 +12,19 @@ import java.util.Date;
 @Component
 @RequiredArgsConstructor
 public class JwtTokenCreator {
-    @Value("${jwt.expiration-time}")
-    private static Long accessEXP;
+    @Value("86400")
+    private Long accessEXP;
 
     @Value("${jwt.secret}")
-    private static String SECRET;
+    private String SECRET;
 
     public static String TOKEN_PREFIX = "Bearer ";
 
 
     public String execute(Member member) {
         String jwt = JWT.create()
-                .withExpiresAt(new Date(System.currentTimeMillis() + accessEXP * 1000))
-                .withClaim("memberId", member.getMemberId().toString())
+                .withExpiresAt(new Date(System.currentTimeMillis() + 86400 * 1000))
+                .withClaim("memberId", member.getMemberId())
                 .withClaim("childFirstName", member.getChildFirstName())
                 .withClaim("childLastName", member.getChildLastName())
                 .withClaim("aiName", member.getAiName())

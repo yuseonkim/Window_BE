@@ -1,13 +1,13 @@
 package org.example.maeum2_be.utils.jwt.security;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import jakarta.servlet.http.HttpServletResponse;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
 import org.example.maeum2_be._core.MessageCode;
 import org.springframework.http.HttpStatus;
 
 
+import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 public class FilterResponseUtils {
