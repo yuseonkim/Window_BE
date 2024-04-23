@@ -1,13 +1,12 @@
 package org.example.maeum2_be.entity.domain;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
+
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
+import javax.persistence.*;
 import java.util.Date;
 
 @Getter
@@ -40,7 +39,8 @@ public class Member {
     @Column(nullable = true)
     private String aiName;
 
-    @Column(nullable = false, columnDefinition = "NotUser")
+    @Column(nullable = false, length = 20)
+    @Enumerated(EnumType.STRING)
     private Role role;
 
 
@@ -57,18 +57,8 @@ public class Member {
         this.aiName = aiName;
     }
 
-    @Builder
-    public Member(String memberId, String childLastName, String childFirstName, String aiName, Role role){
-        this.memberId = memberId;
-        this.childLastName = childLastName;
-        this.childFirstName = childFirstName;
-        this.aiName = aiName;
-        this.role = role;
-    }
 
-    @Builder
-    public Member(String memberId){
-        this.memberId = memberId;
+    public void makeNotUser(){
+        this.role = Role.NotUser;
     }
-
 }

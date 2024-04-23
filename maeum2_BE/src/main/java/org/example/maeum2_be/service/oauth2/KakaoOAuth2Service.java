@@ -6,14 +6,14 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Component;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
 
 import java.util.Map;
 
-@Component
+@Service
 public class KakaoOAuth2Service implements OAuth2Interface {
     @Value("${oauth2.kakao.redirect-uri}")
     private String KAKAO_REDIRECT_URI;
@@ -24,9 +24,9 @@ public class KakaoOAuth2Service implements OAuth2Interface {
     @Value("${oauth2.kakao.user-info-uri}")
     private String KAKAO_USER_INFO_URI;
 
-    RestTemplate restTemplate = new RestTemplate();
     @Override
-    public String getAccessToken(String code ) {
+    public String getAccessToken(String code) {
+        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-type", "application/x-www-form-urlencoded;charset=utf-8");
 
@@ -49,6 +49,7 @@ public class KakaoOAuth2Service implements OAuth2Interface {
 
     @Override
     public KakaoProfileDTO getUserInfo(String accessToken) {
+        RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
         headers.add("Authorization", "Bearer " + accessToken);
