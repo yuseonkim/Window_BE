@@ -1,8 +1,8 @@
 package org.example.maeum2_be.entity.domain;
 
 public enum Role {
-    User("User"),
-    NotUser("NotUser");
+    ROLE_USER("User"),
+    ROLE_BEGINNER("BEGINNER");
 
     String role;
 

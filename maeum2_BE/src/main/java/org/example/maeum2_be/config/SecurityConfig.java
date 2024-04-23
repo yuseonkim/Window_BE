@@ -42,6 +42,13 @@ public class SecurityConfig {
         });
 
 
+
+        http.exceptionHandling().accessDeniedHandler((request, response, accessDeniedException) -> {
+            boolean isRoleNotUser = request.isUserInRole("User");
+            FilterResponseUtils.forbidden(response, isRoleNotUser);
+        });
+
+
         http.cors()
                 .configurationSource(corsConfigurationSource());
         http.apply(new CustomSecurityFilterManager());
@@ -56,9 +63,11 @@ public class SecurityConfig {
 //                // POST 메서드에 대한 /api/post 는 "ROLE_USER" 역할이 필요
 //                .antMatchers(HttpMethod.POST, "/api/post").access("hasRole('USER')")
 //                //인스타그램 연동 한 사람만 접근 가능 "ROLE_USER"
-//                .antMatchers("/api/board/point", "/api/points/**").access("hasRole('USER')")
+
+                //회원가입을 안 한 사람만 접근 가능
+                .antMatchers("/api/user/signUp").access("hasRole('BEGINNER')")
 //                //모든 사용자 접근 가능
-                .antMatchers("/", "/api/login/**", "/api/reissue", "/h2-console/*","/api/post/**").permitAll()
+                .antMatchers("/" ).permitAll()
                 // GET 메서드에 대한 /api/post 는 모든 사용자가 접근 가능
                 .antMatchers(HttpMethod.POST, "/api/login/**").permitAll();
 

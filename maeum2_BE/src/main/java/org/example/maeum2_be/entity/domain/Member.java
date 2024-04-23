@@ -5,8 +5,10 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.springframework.web.bind.annotation.RequestBody;
 
 import javax.persistence.*;
+import java.time.LocalDate;
 import java.util.Date;
 
 @Getter
@@ -25,10 +27,10 @@ public class Member {
 
 
     @Column(nullable = true)
-    private Gender childGender;
+    private String childGender;
 
     @Column(nullable = true)
-    private Date birth;
+    private LocalDate childBirth;
 
     @Column(nullable = true)
     private String email;
@@ -46,19 +48,49 @@ public class Member {
 
 
     @Builder
-    public Member(String memberId, String childFirstName, String childLastName, Gender childGender, Date birth, String email, String phoneNumber, String aiName, Role role){
+    public Member(String memberId, String childFirstName, String childLastName, String childGender, LocalDate birth, String email, String phoneNumber, String aiName, Role role){
         this.memberId = memberId;
         this.childFirstName = childFirstName;
         this.childLastName = childLastName;
         this.childGender = childGender;
-        this.birth = birth;
+        this.childBirth = childBirth;
         this.email = email;
         this.phoneNumber = phoneNumber;
         this.aiName = aiName;
+        this.role = role;
     }
 
 
     public void makeNotUser(){
-        this.role = Role.NotUser;
+        this.role = Role.ROLE_BEGINNER;
+    }
+
+    public void setUserInfo( String phoneNumber,
+                             String email,
+                             String childLastName,
+                             String childFirstName,
+                             LocalDate childBirth,
+                             String gender){
+        this.phoneNumber = phoneNumber;
+        this.email = email;
+        this.childFirstName = childFirstName;
+        this.childLastName = childLastName;
+        this.childBirth = childBirth;
+        this.childGender = gender;
+    }
+
+    @Override
+    public String toString() {
+        return "Member{" +
+                "memberId='" + memberId + '\'' +
+                ", childFirstName='" + childFirstName + '\'' +
+                ", childLastName='" + childLastName + '\'' +
+                ", childGender='" + childGender + '\'' +
+                ", birth=" + childBirth +
+                ", email='" + email + '\'' +
+                ", phoneNumber='" + phoneNumber + '\'' +
+                ", aiName='" + aiName + '\'' +
+                ", role=" + role +
+                '}';
     }
 }

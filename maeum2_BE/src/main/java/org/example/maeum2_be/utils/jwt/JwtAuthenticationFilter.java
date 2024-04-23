@@ -37,6 +37,7 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
   protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException, ServletException, ServletException {
     String jwt = request.getHeader(JwtTokenVerifier.HEADER);
     if (jwt == null) {
+      log.error("토큰없음");
       chain.doFilter(request, response);
       return;
     }
@@ -47,8 +48,8 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
       String childLastName = decodedJWT.getClaim("childLastName").asString();
       String aiName = decodedJWT.getClaim("aiName").asString();
       Role role = Role.valueOf(decodedJWT.getClaim("role").asString());
+      System.out.println("---role---"+role.value());
       Member member = Member.builder().childFirstName(childFirstName).memberId(memberId).childLastName(childLastName).aiName(aiName).role(role).build();
-      System.out.println("member :" + member);
       PrincipalDetails myUserDetails = new PrincipalDetails(member);
       Authentication authentication =
           new UsernamePasswordAuthenticationToken(
