@@ -24,7 +24,7 @@ public class MemberCreator {
 
         if(member == null){
             Member newMember = Member.builder().memberId(kakaoProfileDTO.getId()).build();
-            newMember.makeNotUser();
+            newMember.changeUserRole(Role.ROLE_BEGINNER);
             memberRepository.saveAndFlush(newMember);
             return newMember;
         }
