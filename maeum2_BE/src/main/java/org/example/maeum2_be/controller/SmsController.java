@@ -22,4 +22,9 @@ public class SmsController {
         System.out.println(smsDTO.getPhoneNumber());
         return smsService.sendVerificationCode(smsDTO);
     }
+
+    @PostMapping("/api/user/sms/verification")
+    public ApiResponse<?> compareVerificationCode(@RequestBody SmsDTO smsDTO){
+        return smsService.compareVerificationCode(smsDTO);
+    }
 }

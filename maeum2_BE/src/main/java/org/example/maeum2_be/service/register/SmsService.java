@@ -3,8 +3,11 @@ package org.example.maeum2_be.service.register;
 import lombok.RequiredArgsConstructor;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
+import org.example.maeum2_be._core.MessageCode;
 import org.example.maeum2_be.dto.SmsDTO;
 import org.example.maeum2_be.entity.domain.Sms;
+import org.example.maeum2_be.exception.VerificationCodeNotEqualException;
+import org.example.maeum2_be.exception.VerificationCodeNotFoundException;
 import org.example.maeum2_be.repository.SmsRepository;
 import org.example.maeum2_be.utils.sms.SmsUtil;
 import org.springframework.http.HttpStatus;
@@ -32,6 +35,23 @@ public class SmsService {
         smsRepository.save(sms);
 
 
+        return ApiResponseGenerator.success(HttpStatus.OK);
+    }
+
+    public ApiResponse<?> compareVerificationCode(SmsDTO smsDTO) {
+        String phoneNumber = smsDTO.getPhoneNumber().replaceAll("-","");
+        String verificationCode = smsDTO.getVerificationCode();
+
+        String codeInRedis = smsRepository.findVerificationCode(phoneNumber)
+                .orElseThrow(() -> new VerificationCodeNotFoundException(MessageCode.Verification_Not_Found));
+        System.out.println(verificationCode);
+        System.out.println(codeInRedis);
+
+        if(!codeInRedis.equals(verificationCode)){
+            throw new VerificationCodeNotEqualException(MessageCode.Verification_Not_Equal);
+        }
+
+        smsRepository.deleteVerificationCode(phoneNumber); //인증완료 시 인증번호 Redis에서 삭제
         return ApiResponseGenerator.success(HttpStatus.OK);
     }
 }

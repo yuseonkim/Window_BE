@@ -7,4 +7,7 @@ import lombok.Getter;
 public class SmsDTO {
     @JsonProperty("phone_number")
     String phoneNumber;
+
+    @JsonProperty("verification_code")
+    String verificationCode;
 }
