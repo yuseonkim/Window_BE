@@ -61,8 +61,8 @@ public class Member {
     }
 
 
-    public void makeNotUser(){
-        this.role = Role.ROLE_BEGINNER;
+    public void changeUserRole(Role role){
+        this.role = role;
     }
 
     public void setUserInfo( String phoneNumber,
