@@ -51,6 +51,7 @@ public class SmsService {
             throw new VerificationCodeNotEqualException(MessageCode.Verification_Not_Equal);
         }
 
+        smsRepository.deleteVerificationCode(phoneNumber); //인증완료 시 인증번호 Redis에서 삭제
         return ApiResponseGenerator.success(HttpStatus.OK);
     }
 }
