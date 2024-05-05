@@ -45,10 +45,21 @@ public class Member {
     @Enumerated(EnumType.STRING)
     private Role role;
 
+    @Column(nullable = false)
+    private LocalDate createdAt;
+
+    @Column
+    private LocalDate updateAt;
+
+    @ManyToOne
+    @JoinColumn(name = "chat_room_id")
+    private ChatRoom chatRoom;
+
+
 
 
     @Builder
-    public Member(String memberId, String childFirstName, String childLastName, String childGender, LocalDate birth, String email, String phoneNumber, String aiName, Role role){
+    public Member(String memberId, String childFirstName, String childLastName, String childGender, LocalDate childBirth, String email, String phoneNumber, String aiName, Role role){
         this.memberId = memberId;
         this.childFirstName = childFirstName;
         this.childLastName = childLastName;
@@ -64,6 +75,8 @@ public class Member {
     public void changeUserRole(Role role){
         this.role = role;
     }
+
+    public void changeAiName(String aiName) { this.aiName = aiName;}
 
     public void setUserInfo( String phoneNumber,
                              String email,

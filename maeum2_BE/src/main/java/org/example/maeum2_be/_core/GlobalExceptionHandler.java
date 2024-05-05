@@ -1,6 +1,7 @@
 package org.example.maeum2_be._core;
 
 
+import org.example.maeum2_be.exception.MemberNotFoundException;
 import org.example.maeum2_be.exception.VerificationCodeNotEqualException;
 import org.example.maeum2_be.exception.VerificationCodeNotFoundException;
 import org.springframework.http.HttpStatus;
@@ -22,6 +23,13 @@ public class GlobalExceptionHandler {
             VerificationCodeNotFoundException verificationCodeNotFoundException) {
         return ApiResponseGenerator.fail(verificationCodeNotFoundException.getMessageCode().getCode(),
                 verificationCodeNotFoundException.getMessageCode().getValue(), HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler(MemberNotFoundException.class)
+    public ApiResponse<ApiResponse.CustomBody> memberNotFoundException(
+            MemberNotFoundException memberNotFoundException) {
+        return ApiResponseGenerator.fail(memberNotFoundException.getMessageCode().getCode(),
+                memberNotFoundException.getMessageCode().getValue(), HttpStatus.UNAUTHORIZED);
     }
 
 

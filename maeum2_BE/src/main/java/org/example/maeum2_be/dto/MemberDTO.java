@@ -25,6 +25,9 @@ public class MemberDTO {
     @JsonProperty("email")
     String email;
 
+    @JsonProperty("ai_name")
+    String aiName;
+
     @JsonProperty("phone_number")
     String phoneNumber;
 }
