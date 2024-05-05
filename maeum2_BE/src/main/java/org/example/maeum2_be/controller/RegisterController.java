@@ -4,9 +4,11 @@ package org.example.maeum2_be.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
+import org.example.maeum2_be.dto.AiNameDTO;
 import org.example.maeum2_be.dto.MemberDTO;
 import org.example.maeum2_be.entity.domain.Member;
 import org.example.maeum2_be.entity.domain.PrincipalDetails;
+import org.example.maeum2_be.service.register.AiNameSetter;
 import org.example.maeum2_be.service.register.UserRegister;
 import org.example.maeum2_be.utils.jwt.JwtTokenCreator;
 import org.springframework.http.HttpStatus;
@@ -30,6 +32,7 @@ import java.time.LocalDate;
 public class RegisterController {
     private final UserRegister userRegister;
     private final JwtTokenCreator jwtTokenCreator;
+    private final AiNameSetter aiNameSetter;
 
     @PostMapping("/api/user/signUp")
     public ApiResponse<?> signUp(HttpServletResponse response,
@@ -43,7 +46,13 @@ public class RegisterController {
         response.setContentType("application/json");
         //새로 발급된 토큰을 HTTP 헤더에 추가
         response.addHeader("Authorization", jwt);
-
         return ApiResponseGenerator.success(HttpStatus.OK);
+    }
+
+    @PostMapping("/api/user/aiName")
+    public ApiResponse<?> setAiName(@AuthenticationPrincipal PrincipalDetails principalDetails, MemberDTO memberDTO){
+        String memberId = principalDetails.getMemberId();
+        String aiName = memberDTO.getAiName();
+        return aiNameSetter.execute(memberId,aiName);
     }
 }
