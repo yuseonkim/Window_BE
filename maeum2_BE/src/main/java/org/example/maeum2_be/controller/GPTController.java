@@ -1,7 +1,12 @@
 package org.example.maeum2_be.controller;
 
 import lombok.RequiredArgsConstructor;
+import org.example.maeum2_be.dto.GPTRequestDTO;
+import org.example.maeum2_be.dto.GPTResponseDTO;
+import org.example.maeum2_be.dto.MessageDTO;
+import org.example.maeum2_be.service.gpt.GPTService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -10,7 +15,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class GPTController {
-    private final GPTService gptService;
+    private GPTService gptService;
 
     @PostMapping("/api/main/gpt")
     public String processGPT(@RequestBody String userInput) {
@@ -25,7 +30,7 @@ public class GPTController {
         requestDTO.setMessage(userMessage);
         requestDTO.setModel("gpt-3.5-turbo");
 
-        GPTResponseDTO gptResponse = GPTService.getResponse(requestDTO);
+        GPTResponseDTO gptResponse = gptService.getResponse(requestDTO);
         String text = gptResponse.getChoices().getMessage().getContent();
 
         // JSON 처리
