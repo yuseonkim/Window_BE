@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.maeum2_be.dto.GPTRequestDTO;
 import org.example.maeum2_be.dto.GPTResponseDTO;
 import org.example.maeum2_be.dto.MessageDTO;
+import org.example.maeum2_be.dto.UserInputDTO;
 import org.example.maeum2_be.service.gpt.GPTService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
@@ -15,15 +16,15 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequiredArgsConstructor
 public class GPTController {
-    private GPTService gptService;
+    private final GPTService gptService;
 
     @PostMapping("/api/main/gpt")
-    public String processGPT(@RequestBody String userInput) {
+    public String processGPT(@RequestBody UserInputDTO userInputDTO) {
 
         // 클라이언트로부터 받은 사용자 입력 설정
         MessageDTO userMessage = new MessageDTO();
         userMessage.setRole("user");
-        userMessage.setContent(userInput);
+        userMessage.setContent(userInputDTO.getUserInput());
 
         // GPT 처리
         GPTRequestDTO requestDTO = new GPTRequestDTO();

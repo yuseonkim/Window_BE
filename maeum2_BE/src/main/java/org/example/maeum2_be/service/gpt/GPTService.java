@@ -14,20 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
 
 @Service
+@RequiredArgsConstructor
 public class GPTService {
-    private final String OPENAI_API_URL;
-    private final String OPENAI_API_KEY;
+    @Value("${openai.api.url}")
+    private String OPENAI_API_URL;
+    @Value("${openai.api.key}")
+    private String OPENAI_API_KEY;
 
-    private final RestTemplate restTemplate;
-
-    @Autowired
-    public GPTService(RestTemplate restTemplate,
-                      @Value("${openai.api.url}") String apiUrl,
-                      @Value("${openai.api.key}") String apiKey) {
-        this.restTemplate = restTemplate;
-        this.OPENAI_API_URL = apiUrl;
-        this.OPENAI_API_KEY = apiKey;
-    }
+    private RestTemplate restTemplate = new RestTemplate();
 
     public GPTResponseDTO getResponse(GPTRequestDTO requestDTO) {
         HttpHeaders headers = new HttpHeaders();
