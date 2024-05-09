@@ -1,15 +1,15 @@
 package org.example.maeum2_be.dto;
 
 public class GPTRequestDTO {
-    private MessageDTO message;  // 사용자 입력은 단일 message
+    private MessageDTO messages;
     private String model;
 
-    public MessageDTO getMessage() {
-        return message;
+    public MessageDTO getMessages() {
+        return messages;
     }
 
-    public void setMessage(MessageDTO message) {
-        this.message = message;
+    public void setMessages(MessageDTO userMessage) {
+        this.messages = userMessage;
     }
 
     public String getModel() {
