@@ -6,7 +6,6 @@ import org.example.maeum2_be.dto.GPTResponseDTO;
 import org.example.maeum2_be.dto.MessageDTO;
 import org.example.maeum2_be.dto.UserInputDTO;
 import org.example.maeum2_be.service.gpt.GPTService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -28,7 +27,7 @@ public class GPTController {
 
         // GPT 처리
         GPTRequestDTO requestDTO = new GPTRequestDTO();
-        requestDTO.setMessage(userMessage);
+        requestDTO.setMessages(userMessage);
         requestDTO.setModel("gpt-3.5-turbo");
 
         GPTResponseDTO gptResponse = gptService.getResponse(requestDTO);
