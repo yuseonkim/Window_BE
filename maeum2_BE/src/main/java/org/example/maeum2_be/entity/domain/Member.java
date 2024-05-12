@@ -4,12 +4,12 @@ package org.example.maeum2_be.entity.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.data.annotation.CreatedDate;
+import org.springframework.data.annotation.LastModifiedDate;
 
 import javax.persistence.*;
 import java.time.LocalDate;
-import java.util.Date;
+
 
 @Getter
 @NoArgsConstructor
@@ -44,16 +44,6 @@ public class Member {
     @Column(nullable = false, length = 20)
     @Enumerated(EnumType.STRING)
     private Role role;
-
-    @Column(nullable = false)
-    private LocalDate createdAt;
-
-    @Column
-    private LocalDate updateAt;
-
-    @ManyToOne
-    @JoinColumn(name = "chat_room_id")
-    private ChatRoom chatRoom;
 
 
 
