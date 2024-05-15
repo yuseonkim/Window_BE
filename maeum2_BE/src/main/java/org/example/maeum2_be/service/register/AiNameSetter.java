@@ -7,6 +7,7 @@ import org.example.maeum2_be._core.ApiResponseGenerator;
 import org.example.maeum2_be._core.MessageCode;
 import org.example.maeum2_be.dto.AiNameDTO;
 import org.example.maeum2_be.entity.domain.Member;
+import org.example.maeum2_be.exception.AccessDeniedException;
 import org.example.maeum2_be.exception.MemberNotFoundException;
 import org.example.maeum2_be.repository.MemberRepository;
 import org.springframework.http.HttpStatus;
@@ -19,6 +20,9 @@ public class AiNameSetter {
 
     public ApiResponse<?> execute(String memberId, String aiName){
         Member member = memberRepository.findByMemberId(memberId);
+        if(aiName == null){
+            throw new AccessDeniedException(MessageCode.REQUEST_ACCESS_DENIED);
+        }
         if(member == null){
             throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
         }

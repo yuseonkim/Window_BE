@@ -61,7 +61,7 @@ public class SecurityConfig {
                 //회원가입을 안 한 사람만 접근 가능
                 .antMatchers("/api/user/signUp").access("hasRole('BEGINNER')")
 //                //모든 사용자 접근 가능
-                .antMatchers("/api/home").access("hasRole('USER')")
+                .antMatchers("/api/myPage","/api/home").access("hasRole('USER')")
                 .antMatchers("/api/user/send/**","/api/main/gpt" ).permitAll()
                 // GET 메서드에 대한 /api/post 는 모든 사용자가 접근 가능
                 .antMatchers(HttpMethod.POST, "/api/login/**").permitAll();

@@ -1,6 +1,7 @@
 package org.example.maeum2_be._core;
 
 
+import org.example.maeum2_be.exception.AccessDeniedException;
 import org.example.maeum2_be.exception.MemberNotFoundException;
 import org.example.maeum2_be.exception.VerificationCodeNotEqualException;
 import org.example.maeum2_be.exception.VerificationCodeNotFoundException;
@@ -30,6 +31,13 @@ public class GlobalExceptionHandler {
             MemberNotFoundException memberNotFoundException) {
         return ApiResponseGenerator.fail(memberNotFoundException.getMessageCode().getCode(),
                 memberNotFoundException.getMessageCode().getValue(), HttpStatus.UNAUTHORIZED);
+    }
+
+    @ExceptionHandler(AccessDeniedException.class)
+    public ApiResponse<ApiResponse.CustomBody> accessDeniedException(
+            AccessDeniedException accessDeniedException) {
+        return ApiResponseGenerator.fail(accessDeniedException.getMessageCode().getCode(),
+                accessDeniedException.getMessageCode().getValue(), HttpStatus.BAD_REQUEST);
     }
 
 

@@ -16,6 +16,8 @@ public enum MessageCode {
   EXPIRED_ACCESS_TOKEN("4111", "만료된 토큰입니다."),
   MEMBER_NOT_FOUND("401", "회원정보가 존재하지 않습니다"),
 
+  REQUEST_ACCESS_DENIED("400","잘못된 요청 이름입니다"),
+
   Verification_Not_Equal("400","인증코드가 틀렸습니다."),
   Verification_Not_Found("400","인증번호 발급 후 클릭해주세요.")
 

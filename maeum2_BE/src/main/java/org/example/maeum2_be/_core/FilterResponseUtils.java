@@ -38,7 +38,7 @@ public class FilterResponseUtils {
     response.setContentType("application/json");
     response.setStatus(HttpStatus.FORBIDDEN.value());
     // 현재 사용자의 권한에 따라 다른 에러 메시지를 설정
-    if (isRoleUser) {
+    if (!isRoleUser) {
       ApiResponse<?> apiResponse = ApiResponseGenerator.fail(MessageCode.NEED_REGISTER.getCode(), MessageCode.NEED_REGISTER.getValue(), HttpStatus.FORBIDDEN);
       response.getWriter().write(new ObjectMapper().writeValueAsString(apiResponse.getBody()));
 //
