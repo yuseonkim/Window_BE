@@ -52,7 +52,7 @@ public class RegisterController {
     }
 
     @PostMapping("/api/user/aiName")
-    public ApiResponse<?> setAiName(@AuthenticationPrincipal PrincipalDetails principalDetails, AiNameDTO aiNameDTO){
+    public ApiResponse<?> setAiName(@AuthenticationPrincipal PrincipalDetails principalDetails, @RequestBody AiNameDTO aiNameDTO){
         String memberId = principalDetails.getMemberId();
         String aiName = aiNameDTO.getAiName();
         return aiNameSetter.execute(memberId,aiName);
