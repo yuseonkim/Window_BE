@@ -33,7 +33,7 @@ public class GlobalExceptionHandler {
                 memberNotFoundException.getMessageCode().getValue(), HttpStatus.UNAUTHORIZED);
     }
 
-    @ExceptionHandler(MemberNotFoundException.class)
+    @ExceptionHandler(AccessDeniedException.class)
     public ApiResponse<ApiResponse.CustomBody> accessDeniedException(
             AccessDeniedException accessDeniedException) {
         return ApiResponseGenerator.fail(accessDeniedException.getMessageCode().getCode(),
