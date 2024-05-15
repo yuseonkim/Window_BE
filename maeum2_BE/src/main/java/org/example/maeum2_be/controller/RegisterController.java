@@ -8,6 +8,7 @@ import org.example.maeum2_be.dto.AiNameDTO;
 import org.example.maeum2_be.dto.MemberDTO;
 import org.example.maeum2_be.entity.domain.Member;
 import org.example.maeum2_be.entity.domain.PrincipalDetails;
+import org.example.maeum2_be.exception.AccessDeniedException;
 import org.example.maeum2_be.service.register.AiNameSetter;
 import org.example.maeum2_be.service.register.UserRegister;
 import org.example.maeum2_be.utils.jwt.JwtTokenCreator;
@@ -19,6 +20,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.web.firewall.RequestRejectedException;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -50,9 +52,9 @@ public class RegisterController {
     }
 
     @PostMapping("/api/user/aiName")
-    public ApiResponse<?> setAiName(@AuthenticationPrincipal PrincipalDetails principalDetails, MemberDTO memberDTO){
+    public ApiResponse<?> setAiName(@AuthenticationPrincipal PrincipalDetails principalDetails, AiNameDTO aiNameDTO){
         String memberId = principalDetails.getMemberId();
-        String aiName = memberDTO.getAiName();
+        String aiName = aiNameDTO.getAiName();
         return aiNameSetter.execute(memberId,aiName);
     }
 }

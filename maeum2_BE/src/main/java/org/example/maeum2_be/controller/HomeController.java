@@ -24,15 +24,22 @@ public class HomeController {
 
     private final MemberRepository memberRepository;
 
+    @GetMapping("/api/home")
+    public ApiResponse<?> getHome(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        String childFristName = principalDetails.getUsername();
+        String message = "오늘 하루도 힘내자!";
+        return ApiResponseGenerator.success(new HomeDTO(childFristName,message),HttpStatus.OK);
+    }
+
     @GetMapping("/api/myPage")
-    public ApiResponse<?> home(@AuthenticationPrincipal PrincipalDetails principalDetails){
+    public ApiResponse<?> getMyPage(@AuthenticationPrincipal PrincipalDetails principalDetails){
         Member member = memberRepository.findByMemberId(principalDetails.getMemberId());
         List<KidInformation> kidInformations = new ArrayList<>();
         kidInformations.add(new KidInformation("캐릭터이름",member.getAiName()));
-        kidInformations.add(new KidInformation("성별",member.getChildLastName()));
+        kidInformations.add(new KidInformation("성",member.getChildLastName()));
         kidInformations.add(new KidInformation("이름",member.getChildFirstName()));
         kidInformations.add(new KidInformation("생년월일",member.getChildBirth().toString()));
-        kidInformations.add(new KidInformation("성",member.getChildGender()));
+        kidInformations.add(new KidInformation("성별",member.getChildGender()));
 
         List<GuardianInformation> guardianInformations = new ArrayList<>();
         guardianInformations.add(new GuardianInformation("이메일", member.getEmail()));
