@@ -1,12 +1,14 @@
 package org.example.maeum2_be.dto;
 
+import java.util.List;
+
 public class GPTResponseDTO {
     private String id;
     private String object;
     private long created;
     private String model;
     private String system_fingerprint;
-    private ChoiceDTO choices;
+    private List<ChoiceDTO> choices;
 
     public String getId() {
         return id;
@@ -48,11 +50,11 @@ public class GPTResponseDTO {
         this.system_fingerprint = system_fingerprint;
     }
 
-    public ChoiceDTO getChoices() {
+    public List<ChoiceDTO> getChoices() {
         return choices;
     }
 
-    public void setChoices(ChoiceDTO choices) {
+    public void setChoices(List<ChoiceDTO> choices) {
         this.choices = choices;
     }
 }

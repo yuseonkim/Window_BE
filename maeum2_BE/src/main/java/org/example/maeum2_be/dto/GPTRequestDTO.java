@@ -1,22 +1,15 @@
 package org.example.maeum2_be.dto;
 
+import lombok.Getter;
+import lombok.Setter;
+
+import java.util.List;
+
+@Getter
+@Setter
 public class GPTRequestDTO {
-    private MessageDTO messages;
+    private List<MessageDTO > messages;
     private String model;
 
-    public MessageDTO getMessages() {
-        return messages;
-    }
 
-    public void setMessages(MessageDTO userMessage) {
-        this.messages = userMessage;
-    }
-
-    public String getModel() {
-        return model;
-    }
-
-    public void setModel(String model) {
-        this.model = model;
-    }
 }
