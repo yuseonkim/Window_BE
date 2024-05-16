@@ -22,6 +22,7 @@ import org.springframework.data.redis.serializer.StringRedisSerializer;
 
 import java.time.Duration;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 @RequiredArgsConstructor
@@ -43,17 +44,27 @@ public class RedisConfig {
         RedisStandaloneConfiguration standaloneConfig = new RedisStandaloneConfiguration();
         standaloneConfig.setHostName(host);
         standaloneConfig.setPort(port);
-        standaloneConfig.setDatabase(0); // Set the database number to 0
+        standaloneConfig.setDatabase(0); // 데이터베이스 번호를 0으로 설정
 
         return new LettuceConnectionFactory(standaloneConfig);
     }
 
     @Bean
-    public RedisTemplate<String, String> redisTemplate() {
+    @Primary
+    public RedisTemplate<String, String> redisTemplate(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connectionFactory) {
         RedisTemplate<String, String> redisTemplate = new RedisTemplate<>();
-        redisTemplate.setConnectionFactory(lettuceConnectionFactory());
-        redisTemplate.setKeySerializer(new StringRedisSerializer());   // Key: String
+        redisTemplate.setConnectionFactory(connectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer());   // 키: String
         redisTemplate.setValueSerializer(new Jackson2JsonRedisSerializer<>(String.class));
+        return redisTemplate;
+    }
+
+    @Bean
+    public RedisTemplate<String, List<String>> listRedisTemplate(@Qualifier("lettuceConnectionFactory") LettuceConnectionFactory connectionFactory) {
+        RedisTemplate<String, List<String>> redisTemplate = new RedisTemplate<>();
+        redisTemplate.setConnectionFactory(connectionFactory);
+        redisTemplate.setKeySerializer(new StringRedisSerializer()); // 키: String
+        redisTemplate.setValueSerializer(new GenericJackson2JsonRedisSerializer()); // 값: List<String>
         return redisTemplate;
     }
 
