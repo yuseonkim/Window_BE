@@ -4,6 +4,7 @@ package org.example.maeum2_be.entity.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -41,7 +42,7 @@ public class Member {
     @Column(nullable = true)
     private String aiName;
 
-    @Column(nullable = false, length = 20)
+    @Column(length = 20)
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -59,6 +60,10 @@ public class Member {
         this.phoneNumber = phoneNumber;
         this.aiName = aiName;
         this.role = role;
+    }
+
+    public Member(String id) {
+        this.memberId = id;
     }
 
 

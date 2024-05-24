@@ -38,9 +38,8 @@ public class RegisterController {
 
     @PostMapping("/api/user/signUp")
     public ApiResponse<?> signUp(HttpServletResponse response,
-                                 @RequestBody MemberDTO memberDTO,
-                                 @AuthenticationPrincipal PrincipalDetails principalDetails){
-       Member member =  userRegister.signUpUser(principalDetails,memberDTO);
+                                 @RequestBody MemberDTO memberDTO){
+       Member member =  userRegister.signUpUser(memberDTO);
        jwtTokenCreator.execute(member);
 
         String jwt = jwtTokenCreator.execute(member);

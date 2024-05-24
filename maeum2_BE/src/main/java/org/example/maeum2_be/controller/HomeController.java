@@ -31,6 +31,12 @@ public class HomeController {
         return ApiResponseGenerator.success(new HomeDTO(childFristName,message),HttpStatus.OK);
     }
 
+    @GetMapping("/api/test")
+    public ApiResponse<?> getTest(){
+        String message = "테스트 성공";
+        return ApiResponseGenerator.success(message,HttpStatus.OK);
+    }
+
     @GetMapping("/api/myPage")
     public ApiResponse<?> getMyPage(@AuthenticationPrincipal PrincipalDetails principalDetails){
         Member member = memberRepository.findByMemberId(principalDetails.getMemberId());

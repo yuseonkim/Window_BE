@@ -23,10 +23,11 @@ public class MemberCreator {
         Member member = memberRepository.findByMemberId(kakaoProfileDTO.getId());
 
         if(member == null){
-            Member newMember = Member.builder().memberId(kakaoProfileDTO.getId()).build();
-            newMember.changeUserRole(Role.ROLE_BEGINNER);
-            memberRepository.saveAndFlush(newMember);
-            return newMember;
+//            Member newMember = Member.builder().memberId(kakaoProfileDTO.getId()).build();
+//            newMember.changeUserRole(Role.ROLE_BEGINNER);
+//            memberRepository.saveAndFlush(newMember);
+//            return newMember;
+            return new Member(kakaoProfileDTO.getId());
         }
 
         return member;
