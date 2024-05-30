@@ -7,7 +7,13 @@ import lombok.extern.slf4j.Slf4j;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
 import org.example.maeum2_be.dto.*;
+import org.example.maeum2_be.entity.domain.Chat;
+import org.example.maeum2_be.entity.domain.ChatRoom;
+import org.example.maeum2_be.entity.domain.Member;
 import org.example.maeum2_be.entity.domain.PrincipalDetails;
+import org.example.maeum2_be.repository.ChatRepository;
+import org.example.maeum2_be.repository.ChatRoomRepository;
+import org.example.maeum2_be.repository.MemberRepository;
 import org.example.maeum2_be.service.gpt.GPTService;
 import org.example.maeum2_be.repository.ConversationRepository;
 import org.springframework.http.HttpHeaders;
@@ -19,6 +25,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,22 +35,41 @@ import java.util.List;
 public class GPTController {
     private final GPTService gptService;
     private final ConversationRepository conversationRepository;
+    private final MemberRepository memberRepository;
+    private final ChatRepository chatRepository;
+    private final ChatRoomRepository chatRoomRepository;
 
 
     @GetMapping("/api/main/quit")
-    public ApiResponse<?> quitGPT(){
-        String userId= "1";
-        List<String> previousConversations = conversationRepository.getConversations(userId);
-        for(String text : previousConversations){
+    public ApiResponse<?> quitGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
 
+        // 사용자(Member) 조회
+        Member member = new Member(); // 사용자 객체를 조회하는 로직 필요
+        member = memberRepository.findByMemberId(userId);
+
+        // ChatRoom 생성 또는 조회
+        ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
+        chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
+
+        // Redis에서 이전 대화 기록을 가져옴
+        List<String> previousConversations = conversationRepository.getConversations(userId);
+
+        // 대화 내용을 Chat 엔티티로 저장
+        for (String text : previousConversations) {
+            Chat chat = new Chat(chatRoom,text);
+            chatRepository.save(chat);
         }
+
+        // 이전 대화 기록 삭제
         conversationRepository.delete(userId);
+
         return ApiResponseGenerator.success(HttpStatus.OK);
     }
 
     @PostMapping("/api/main/gpt2")
-    public ApiResponse<?> processGPT2(@RequestBody UserInputDTO userInputDTO) {
-        String userId = "1"; // 사용자의 ID를 받아온다고 가정합니다.
+    public ApiResponse<?> processGPT2(@RequestBody UserInputDTO userInputDTO, @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId =  principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
         String userInput = userInputDTO.getUserInput(); // 사용자의 입력.
 
         // Redis에서 이전 대화 기록을 가져옴
@@ -176,8 +202,9 @@ public class GPTController {
     }
 
     @PostMapping("/api/main/gpt1")
-    public ApiResponse<?> processGPT1(@RequestBody UserInputDTO userInputDTO) {
-        String userId = "1"; // 사용자의 ID를 받아온다고 가정합니다.
+    public ApiResponse<?> processGPT1(@RequestBody UserInputDTO userInputDTO,
+    @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
         String userInput = userInputDTO.getUserInput(); // 사용자의 입력.
 
         // Redis에서 이전 대화 기록을 가져옴
