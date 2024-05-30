@@ -1,21 +1,14 @@
 package org.example.maeum2_be.dto;
 
-import java.util.List;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.RequiredArgsConstructor;
 
+@Data
+@AllArgsConstructor
 public class TextResponseDTO {
-    private List<String> texts;
-
-    public TextResponseDTO() {}
-
-    public TextResponseDTO(List<String> texts) {
-        this.texts = texts;
-    }
-
-    public List<String> getTexts() {
-        return texts;
-    }
-
-    public void setTexts(List<String> texts) {
-        this.texts = texts;
-    }
+    private String message;
+    private String status;
+    private String phase;
+    private boolean isSolved;
 }

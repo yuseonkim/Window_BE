@@ -19,16 +19,19 @@ import org.springframework.stereotype.Service;
 public class UserRegister {
 
     private final MemberRepository memberRepository;
-    public Member signUpUser(@AuthenticationPrincipal PrincipalDetails principalDetails, MemberDTO memberDTO){
-        String memberId = principalDetails.getMemberId();
-        Member member =  memberRepository.findByMemberId(memberId);
-        if(member == null){
-            throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
-        }
-        member.setUserInfo(memberDTO.getPhoneNumber(), memberDTO.getEmail(),memberDTO.getChildLastName(),memberDTO.getChildFirstName(),memberDTO.getChildBirth(),memberDTO.getChildGender());
-        member.changeUserRole(Role.ROLE_USER);
-        memberRepository.saveAndFlush(member);
-        return member;
+    public Member signUpUser(MemberDTO memberDTO){
+        String memberId = memberDTO.getMemberId();
+        Member newMember = Member.builder().memberId(memberId)
+                .childFirstName(memberDTO.getChildFirstName())
+                .childLastName(memberDTO.getChildLastName())
+                .email(memberDTO.getEmail())
+                .childBirth(memberDTO.getChildBirth())
+                .phoneNumber(memberDTO.getPhoneNumber())
+                .childGender(memberDTO.getChildGender())
+                .build();
+            newMember.changeUserRole(Role.ROLE_USER);
+            memberRepository.saveAndFlush(newMember);
+        return newMember;
     }
 
     public ApiResponse<?> changeUserInfo(String memberId, MemberDTO memberDTO){

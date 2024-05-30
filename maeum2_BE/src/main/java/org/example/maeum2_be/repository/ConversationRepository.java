@@ -21,4 +21,8 @@ public class ConversationRepository {
         ListOperations<String, String> listOps = redisTemplate.opsForList();
         return listOps.range(key, 0, -1);
     }
+
+    public void delete(final String key) {
+        redisTemplate.delete(key);
+    }
 }

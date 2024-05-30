@@ -10,6 +10,9 @@ import java.time.LocalDate;
 @Getter
 @JsonNaming(PropertyNamingStrategy.SnakeCaseStrategy.class)
 public class MemberDTO {
+    @JsonProperty("member_id")
+    String memberId;
+
     @JsonProperty("child_first_name")
     String childFirstName;
 
