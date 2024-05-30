@@ -5,6 +5,7 @@ import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
 import org.example.maeum2_be._core.MessageCode;
 import org.example.maeum2_be.dto.details.ChatDTO;
+import org.example.maeum2_be.dto.details.ChatRequestDTO;
 import org.example.maeum2_be.dto.details.ChatRoomDTO;
 import org.example.maeum2_be.entity.domain.Chat;
 import org.example.maeum2_be.entity.domain.ChatRoom;
@@ -50,19 +51,19 @@ public class ChatController {
         return ApiResponseGenerator.success(chatRoomDTOs.getContent(), HttpStatus.OK);
     }
 
-    @GetMapping("/api/chats/{id}")
+    @GetMapping("/api/chats")
     public ApiResponse<?> getChatRoomsDetails(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable Long id,
+            @RequestParam ChatRequestDTO chatRequestDTO,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
+            @RequestParam(defaultValue = "7") int size
     ){
         String memberId = principalDetails.getMemberId();
         Member member = memberRepository.findByMemberId(memberId);
         if(member == null){
             throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
         }
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomsById(id);
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomsById(chatRequestDTO.getId());
         if(!chatRoom.getMember().getMemberId().equals(memberId)){
             throw new AccessDeniedException(MessageCode.REQUEST_ACCESS_DENIED);
         }
