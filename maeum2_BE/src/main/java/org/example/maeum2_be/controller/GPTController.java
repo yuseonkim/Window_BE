@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
+import org.example.maeum2_be._core.MessageCode;
 import org.example.maeum2_be.dto.*;
 import org.example.maeum2_be.entity.domain.Chat;
 import org.example.maeum2_be.entity.domain.ChatRoom;
 import org.example.maeum2_be.entity.domain.Member;
 import org.example.maeum2_be.entity.domain.PrincipalDetails;
+import org.example.maeum2_be.exception.MemberNotFoundException;
 import org.example.maeum2_be.repository.ChatRepository;
 import org.example.maeum2_be.repository.ChatRoomRepository;
 import org.example.maeum2_be.repository.MemberRepository;
@@ -44,12 +46,60 @@ public class GPTController {
     public ApiResponse<?> quitGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
 
+        // Redis에서 이전 대화 기록을 가져옴
+        List<String> previousConversations = conversationRepository.getConversations(userId);
+
+        // 이전 대화 기록 삭제
+        conversationRepository.delete(userId);
+
+        return ApiResponseGenerator.success(HttpStatus.OK);
+    }
+
+    @GetMapping("/api/main/solve")
+    public ApiResponse<?> solveGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
+
+
         // 사용자(Member) 조회
         Member member = new Member(); // 사용자 객체를 조회하는 로직 필요
         member = memberRepository.findByMemberId(userId);
+        if (member == null) {
+            throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
+        }
 
         // ChatRoom 생성 또는 조회
         ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
+        chatRoom.setSolved(true);
+        chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
+
+        // Redis에서 이전 대화 기록을 가져옴
+        List<String> previousConversations = conversationRepository.getConversations(userId);
+
+        // 대화 내용을 Chat 엔티티로 저장
+        for (String text : previousConversations) {
+            Chat chat = new Chat(chatRoom,text);
+            chatRepository.save(chat);
+        }
+
+        // 이전 대화 기록 삭제
+        conversationRepository.delete(userId);
+
+        return ApiResponseGenerator.success(HttpStatus.OK);
+    }
+    @GetMapping("/api/main/wrong")
+    public ApiResponse<?> saveGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
+
+        // 사용자(Member) 조회
+        Member member = new Member(); // 사용자 객체를 조회하는 로직 필요
+        member = memberRepository.findByMemberId(userId);
+        if (member == null) {
+            throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
+        }
+
+        // ChatRoom 생성 또는 조회
+        ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
+        chatRoom.setSolved(false);
         chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
 
         // Redis에서 이전 대화 기록을 가져옴
@@ -87,20 +137,14 @@ public class GPTController {
                         "- Tone : 매우 재밌는, 재치있는, 유머있는, 아이와 친근한\n" +
                         "\n" +
                         " 다섯고개 게임 - 게임 마스터 가이드 \n" +
-                        "역할: 너는 다섯고개 게임의 게임 마스터이다. 초등학교 저학년 수준의 아이와 게임을 할거야.\n" +
+                        "역할: 너는 다섯고개 게임의 게임 마스터이다. 초등학교 저학년 수준의 아이와 게임을 합니다.\n" +
                         " \n" +
                         "목표: 사용자가 생각하는 물건, 동물, 개념 등을 추측하기 위해 yes-or-no 질문으로 이끄는 다섯고개 게임을 만듭니다. \n" +
                         "\n" +
                         "ChatGPT 지침: \n" +
-                        "\n" +
-                        "답변 형식:\n" +
-                        "- 예시 :\n" +
-                        "}\n" +
-                        "- 게임을 진행할 때는, 위 예시처럼 \"질문 번호\", \"남은 질문 수\", \"message\" 키워드를 사용해서 답변을 json형식으로 리턴합니다.\n" +
-                        "- 그외의 경우에는 \"message\" 키워드만 사용해서 답변을 json 형식으로 리턴합니다.\n" +
-                        "\n" +
                         "게임 시작: \n" +
                         "- 친절한 인사로 시작합니다.\n" +
+                        "- 항상 친근한 반말을 사용합니다.\n" +
                         "\n" +
                         "카테고리 선택: \n" +
                         "- 사용자가 선택할 수 있는 카테고리 목록(동물, 물건)을 제시합니다. \n" +
@@ -132,12 +176,13 @@ public class GPTController {
                         "- 2번의 질문 후 두번째로 답을 맞춰봅니다. 사용자에게 실제 답을 공개하도록 요청합니다.\n" +
                         "- 두번째로 답이 틀렸을 경우 정답을 맞추지 못한 것입니다.\n" +
                         "- 정답을 맞추지 못했다면 아쉬워합니다.\n"+
-                "GPT의 응답 형식은 반드시 JSON이어야 하며, 모두 값을 가져야합니다. 다음과 같아야 합니다:\n" +
+                        "GPT의 응답 형식은 반드시 JSON이어야 하며, 모두 값을 가져야합니다. 다음과 같아야 합니다:\n" +
                         "{\n" +
                         "  \"message\": \"아이에게 할 메세지\",\n" +
-                        "  \"status\": \"기쁨\", \"아쉬움\", \"놀람\" 중 하나,\n" +
-                        "  \"phase\": \"몇번째 대화인지 예시 (1,2,3)\",\n" +
-                        "  \"isSolved\": 정답인지 여부 (true 또는 false)\n" +
+                        "  \"status\": \"기쁨\", \"아쉬움\", \"놀람\" 중 하나, 다른거 안돼 무조건 이중에 하나야\n" +
+                        "  \"chance\": \"질문할 기회가 몇번 남았는지 예시 (1,2,3)\",\n" +
+                        "  \"isSolved\": 너가 정답을 제시하는지에 대한 여부 (true 또는 false) 너가 정답이 맞는지에 대해 묻는다면 true를 답해줘야해 무조건! \n" +
+                        "  \"isEnd\": 게임이 끝났는지 여부 (true 또는 false)\n" +
                         "}"
         );
 
@@ -177,9 +222,10 @@ public class GPTController {
                     JsonNode jsonNode = objectMapper.readTree(content);
                     String message = jsonNode.path("message").asText();
                     String status = jsonNode.path("status").asText();
-                    String phase = jsonNode.path("phase").asText();
+                    String chance = jsonNode.path("chance").asText();
                     boolean isSolved = jsonNode.path("isSolved").asBoolean();
-                    textResponseDTOList.add(new TextResponseDTO(message, status, phase, isSolved));
+                    boolean isEnd = jsonNode.path("isEnd").asBoolean();
+                    textResponseDTOList.add(new TextResponseDTO(message, status, chance, isSolved,isEnd));
                 } else {
                     // JSON 형식을 찾지 못한 경우 로그 출력
                     System.out.println("Invalid JSON response: " + content);
@@ -222,13 +268,14 @@ public class GPTController {
                         "- Tone : 매우 재밌는, 재치있는, 유머있는, 아이와 친근한\n" +
                         "\n" +
                         " 다섯고개 게임 - 게임 마스터 가이드 \n" +
-                        "역할: 너는 다섯고개 게임의 게임 마스터이다. 초등학교 저학년 수준의 아이와 게임을 할거야.\n" +
+                        "역할: 너는 다섯고개 게임의 게임 마스터이다. 초등학교 저학년 수준의 아이와 게임을 한다.\n" +
                         " \n" +
                         "목표: AI가 생각하는 물건, 동물, 개념 등을 추측하기 위해 사용자가 yes-or-no 질문을 하는 다섯고개 게임을 만듭니다. \n" +
                         "\n" +
                         " ChatGPT 지침: \n" +
                         "게임 시작: \n" +
                         "- 친절한 인사로 시작합니다.\n" +
+                        "- 항상 친근한 반말을 사용합니다.\n" +
                         "\n" +
                         "카테고리 선택: \n" +
                         "- 사용자가 선택할 수 있는 카테고리 목록(동물, 물건)을 제시합니다. \n" +
@@ -262,9 +309,10 @@ public class GPTController {
                         "GPT의 응답 형식은 반드시 JSON이어야 하며, 다음과 같아야 합니다:\n" +
                         "{\n" +
                         "  \"message\": \"아이에게 할 메세지\",\n" +
-                        "  \"status\": \"기쁨\", \"아쉬움\", \"놀람\" 중 하나,\n" +
-                        "  \"phase\": \"몇번째 질문인지 예시 (1,2,3)\",\n" +
+                        "  \"status\": \"기쁨\", \"아쉬움\", \"놀람\" 중 하나,다른거 안돼 무조건 이중에 하나야\n" +
+                        "  \"chance\": \"질문할 기회가 몇번 남았는지 예시 (1,2,3)\",\n" +
                         "  \"isSolved\": 정답인지 여부 (true 또는 false)\n" +
+                        "  \"isEnd\": 게임이 끝났는지 여부 (true 또는 false)\n" +
                         "}"
         );
 
@@ -304,9 +352,10 @@ public class GPTController {
                     JsonNode jsonNode = objectMapper.readTree(content);
                     String message = jsonNode.path("message").asText();
                     String status = jsonNode.path("status").asText();
-                    String phase = jsonNode.path("phase").asText();
+                    String chance = jsonNode.path("chance").asText();
                     boolean isSolved = jsonNode.path("isSolved").asBoolean();
-                    textResponseDTOList.add(new TextResponseDTO(message, status, phase, isSolved));
+                    boolean isEnd = jsonNode.path("isEnd").asBoolean();
+                    textResponseDTOList.add(new TextResponseDTO(message, status, chance, isSolved,isEnd));
                 } else {
                     // JSON 형식을 찾지 못한 경우 로그 출력
                     System.out.println("Invalid JSON response: " + content);

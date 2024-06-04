@@ -8,5 +8,5 @@ import lombok.Getter;
 @Getter
 public class ChatRequestDTO {
     @JsonProperty("detail_id")
-    Long id;
+    Long detailId;
 }

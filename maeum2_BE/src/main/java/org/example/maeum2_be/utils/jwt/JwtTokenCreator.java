@@ -28,6 +28,7 @@ public class JwtTokenCreator {
                 .withClaim("childFirstName", member.getChildFirstName())
                 .withClaim("childLastName", member.getChildLastName())
                 .withClaim("aiName", member.getAiName())
+                .withClaim("email",member.getEmail())
                 .withClaim("role", member.getRole().toString())
                 .sign(Algorithm.HMAC512(SECRET));
         return TOKEN_PREFIX + jwt;
