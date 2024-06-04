@@ -3,6 +3,7 @@ package org.example.maeum2_be.controller;
 import lombok.RequiredArgsConstructor;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
+import org.example.maeum2_be._core.RandomMessage;
 import org.example.maeum2_be.dto.HomeDTO;
 import org.example.maeum2_be.dto.SettingDTO;
 import org.example.maeum2_be.dto.myPage.GuardianInformation;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Random;
 
 @Controller
 @RequiredArgsConstructor
@@ -27,9 +29,10 @@ public class HomeController {
 
     @GetMapping("/api/home")
     public ApiResponse<?> getHome(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        Random random = new Random();
+        String randomMessage = RandomMessage.getRandomMessage(random);
         Member member = principalDetails.getMember();
-        String message = "오늘 하루도 힘내자!";
-        return ApiResponseGenerator.success(new HomeDTO(member.getChildFirstName(),message),HttpStatus.OK);
+        return ApiResponseGenerator.success(new HomeDTO(member.getChildFirstName(),randomMessage),HttpStatus.OK);
     }
 
     @GetMapping("/api/test")
