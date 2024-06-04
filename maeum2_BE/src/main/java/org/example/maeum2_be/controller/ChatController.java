@@ -5,6 +5,7 @@ import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
 import org.example.maeum2_be._core.MessageCode;
 import org.example.maeum2_be.dto.details.ChatDTO;
+import org.example.maeum2_be.dto.details.ChatRequestDTO;
 import org.example.maeum2_be.dto.details.ChatRoomDTO;
 import org.example.maeum2_be.entity.domain.Chat;
 import org.example.maeum2_be.entity.domain.ChatRoom;
@@ -20,13 +21,11 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.util.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -35,6 +34,7 @@ public class ChatController {
     private final ChatRoomRepository chatRoomRepository;
     private final ChatRepository chatRepository;
     private final MemberRepository memberRepository;
+
     @GetMapping("/api/chats")
     public ApiResponse<?> getChatRoomsByMember(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
@@ -45,40 +45,56 @@ public class ChatController {
         Pageable pageable = PageRequest.of(page, size);
         Member member = memberRepository.findByMemberId(principalDetails.getMemberId());
         Page<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByMember(member, pageable);
-        Page<ChatRoomDTO> chatRoomDTOs = chatRooms.map(chatRoom -> new ChatRoomDTO(chatRoom.getId(), chatRoom.getTimestamp()));
+        Page<ChatRoomDTO> chatRoomDTOs = chatRooms.map(chatRoom -> new ChatRoomDTO(chatRoom.getId(),chatRoom.isSolved(), chatRoom.getTimestamp()));
 
         return ApiResponseGenerator.success(chatRoomDTOs.getContent(), HttpStatus.OK);
     }
 
-    @GetMapping("/api/chats/{id}")
+    @GetMapping("/api/chats/detail")
     public ApiResponse<?> getChatRoomsDetails(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
-            @PathVariable Long id,
+            @RequestBody ChatRequestDTO chatRequestDTO,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size
-    ){
+            @RequestParam(defaultValue = "20") int size
+    ) {
         String memberId = principalDetails.getMemberId();
         Member member = memberRepository.findByMemberId(memberId);
-        if(member == null){
+        if (member == null) {
             throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
         }
-        ChatRoom chatRoom = chatRoomRepository.findChatRoomsById(id);
-        if(!chatRoom.getMember().getMemberId().equals(memberId)){
+        ChatRoom chatRoom = chatRoomRepository.findChatRoomsById(chatRequestDTO.getDetailId());
+        if (!chatRoom.getMember().getMemberId().equals(memberId)) {
             throw new AccessDeniedException(MessageCode.REQUEST_ACCESS_DENIED);
         }
 
         Pageable pageable = PageRequest.of(page, size);
-        Page<Chat> chats = chatRepository.findChatsByChatRoom(chatRoom,pageable);
-        List<ChatDTO> chatDTOs = new ArrayList<>();
+        Page<Chat> chats = chatRepository.findChatsByChatRoom(chatRoom, pageable);
+        List<Map<String, Object>> chatPairs = new ArrayList<>();
+
+        Iterator<Chat> chatIterator = chats.iterator();
         int startingIndex = page * size + 1;
         int index = startingIndex;
-        for (Chat chat : chats) {
-            ChatDTO chatDTO = new ChatDTO(index, chat.getMessage());
-            chatDTOs.add(chatDTO);
-            index++;
+        while (chatIterator.hasNext()) {
+            Chat childChat = chatIterator.next();
+            if (chatIterator.hasNext()) {
+                Chat aiChat = chatIterator.next();
+                Map<String, Object> chatPair = new HashMap<>();
+                chatPair.put("id",index);
+                chatPair.put("ask", childChat.getMessage());
+                chatPair.put("answer", aiChat.getMessage());
+                chatPairs.add(chatPair);
+                index++;
+            }
         }
 
-        return ApiResponseGenerator.success(chatDTOs, HttpStatus.OK);
+        Map<String, Object> response = new HashMap<>();
+        response.put("child_name", principalDetails.getMember().getChildFirstName());
+        response.put("ai_name", principalDetails.getMember().getAiName());
+        response.put("date", LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")));
+        response.put("chats", chatPairs);
+
+        return ApiResponseGenerator.success(response, HttpStatus.OK);
     }
+
 
 }

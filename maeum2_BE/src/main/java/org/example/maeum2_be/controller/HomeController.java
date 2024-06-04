@@ -4,6 +4,7 @@ import lombok.RequiredArgsConstructor;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
 import org.example.maeum2_be.dto.HomeDTO;
+import org.example.maeum2_be.dto.SettingDTO;
 import org.example.maeum2_be.dto.myPage.GuardianInformation;
 import org.example.maeum2_be.dto.myPage.KidInformation;
 import org.example.maeum2_be.dto.myPage.MyPageDTO;
@@ -26,9 +27,9 @@ public class HomeController {
 
     @GetMapping("/api/home")
     public ApiResponse<?> getHome(@AuthenticationPrincipal PrincipalDetails principalDetails){
-        String childFristName = principalDetails.getUsername();
+        Member member = principalDetails.getMember();
         String message = "오늘 하루도 힘내자!";
-        return ApiResponseGenerator.success(new HomeDTO(childFristName,message),HttpStatus.OK);
+        return ApiResponseGenerator.success(new HomeDTO(member.getChildFirstName(),message),HttpStatus.OK);
     }
 
     @GetMapping("/api/test")
@@ -53,6 +54,12 @@ public class HomeController {
 
         MyPageDTO myPageDTO = new MyPageDTO(kidInformations,guardianInformations);
         return ApiResponseGenerator.success(myPageDTO, HttpStatus.OK);
+    }
+
+    @GetMapping("/api/setting")
+    public ApiResponse<?> getSettingPage(@AuthenticationPrincipal PrincipalDetails principalDetails){
+        Member member = principalDetails.getMember();
+        return ApiResponseGenerator.success(new SettingDTO(member.getChildFirstName(),member.getEmail()),HttpStatus.OK);
     }
 
 

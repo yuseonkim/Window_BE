@@ -47,9 +47,10 @@ public class JwtAuthenticationFilter extends BasicAuthenticationFilter {
       String childFirstName = decodedJWT.getClaim("childFirstName").asString();
       String childLastName = decodedJWT.getClaim("childLastName").asString();
       String aiName = decodedJWT.getClaim("aiName").asString();
+      String email = decodedJWT.getClaim("email").asString();
       Role role = Role.valueOf(decodedJWT.getClaim("role").asString());
       System.out.println("---role---"+role.value());
-      Member member = Member.builder().childFirstName(childFirstName).memberId(memberId).childLastName(childLastName).aiName(aiName).role(role).build();
+      Member member = Member.builder().childFirstName(childFirstName).memberId(memberId).childLastName(childLastName).aiName(aiName).role(role).email(email).build();
       PrincipalDetails myUserDetails = new PrincipalDetails(member);
       Authentication authentication =
           new UsernamePasswordAuthenticationToken(

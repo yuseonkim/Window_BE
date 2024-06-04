@@ -2,6 +2,7 @@ package org.example.maeum2_be.entity.domain;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
+import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
@@ -20,6 +21,10 @@ public class ChatRoom {
     @JoinColumn(name = "member_id",nullable = false)
     private Member member;
 
+    @Setter
+    @Column
+    private boolean isSolved;
+
     @OneToMany(mappedBy = "chatRoom")
     private List<Chat> chats;
 
@@ -29,7 +34,6 @@ public class ChatRoom {
 
     @CreatedDate
     private LocalDateTime timestamp;
-
 
     public ChatRoom(Member member, LocalDateTime now) {
         this.member = member;
