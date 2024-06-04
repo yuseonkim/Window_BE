@@ -6,11 +6,13 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.example.maeum2_be._core.ApiResponse;
 import org.example.maeum2_be._core.ApiResponseGenerator;
+import org.example.maeum2_be._core.MessageCode;
 import org.example.maeum2_be.dto.*;
 import org.example.maeum2_be.entity.domain.Chat;
 import org.example.maeum2_be.entity.domain.ChatRoom;
 import org.example.maeum2_be.entity.domain.Member;
 import org.example.maeum2_be.entity.domain.PrincipalDetails;
+import org.example.maeum2_be.exception.MemberNotFoundException;
 import org.example.maeum2_be.repository.ChatRepository;
 import org.example.maeum2_be.repository.ChatRoomRepository;
 import org.example.maeum2_be.repository.MemberRepository;
@@ -40,16 +42,33 @@ public class GPTController {
     private final ChatRoomRepository chatRoomRepository;
 
 
-    @GetMapping("/api/main/quit")
     public ApiResponse<?> quitGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
+
+        // Redis에서 이전 대화 기록을 가져옴
+        List<String> previousConversations = conversationRepository.getConversations(userId);
+
+        // 이전 대화 기록 삭제
+        conversationRepository.delete(userId);
+
+        return ApiResponseGenerator.success(HttpStatus.OK);
+    }
+
+    @GetMapping("/api/main/solve")
+    public ApiResponse<?> solveGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
+
 
         // 사용자(Member) 조회
         Member member = new Member(); // 사용자 객체를 조회하는 로직 필요
         member = memberRepository.findByMemberId(userId);
+        if (member == null) {
+            throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
+        }
 
         // ChatRoom 생성 또는 조회
         ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
+        chatRoom.setSolved(true);
         chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
 
         // Redis에서 이전 대화 기록을 가져옴
@@ -66,7 +85,33 @@ public class GPTController {
 
         return ApiResponseGenerator.success(HttpStatus.OK);
     }
+    @GetMapping("/api/main/wrong")
+    public ApiResponse<?> saveGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
 
+        // 사용자(Member) 조회
+        Member member = new Member(); // 사용자 객체를 조회하는 로직 필요
+        member = memberRepository.findByMemberId(userId);
+        if (member == null) {
+            throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
+        }
+
+        // ChatRoom 생성 또는 조회
+        ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
+        chatRoom.setSolved(false);
+        chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
+
+        // Redis에서 이전 대화 기록을 가져옴
+        List<String> previousConversations = conversationRepository.getConversations(userId);
+        // 대화 내용을 Chat 엔티티로 저장
+        for (String text : previousConversations) {
+            Chat chat = new Chat(chatRoom,text);
+            chatRepository.save(chat);
+        }
+        // 이전 대화 기록 삭제
+        conversationRepository.delete(userId);
+        return ApiResponseGenerator.success(HttpStatus.OK);
+    }
     @PostMapping("/api/main/gpt2")  // GPT가 맞추기
     public ApiResponse<?> processGPT2(@RequestBody UserInputDTO userInputDTO, @AuthenticationPrincipal PrincipalDetails principalDetails) {
         String userId =  principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
@@ -102,7 +147,7 @@ public class GPTController {
                         "  \"status\": 기쁨, 아쉬움, 놀람 중 대화 맥락에 맞는 하나\n" +
                         "  \"chance\": 남은 질문 횟수\n" +
                         "  \"tryGuess\": 최종 추측 수\n" +
-                        "  \"isSolved\": 정답인지 여부 (true 또는 false)\n" +
+                        "  \"isSolved\": 너가 정답을 제시하는지에 대한 여부, 너가 정답이 맞는지에 대해 묻는다면 true를 답해줘야해 (true 또는 false)\n" +
                         "  \"isEnd\": 게임종료 여부 (true 또는 false)\n" +
                         "}\n" +
                         "\n" +
