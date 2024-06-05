@@ -129,7 +129,7 @@ public class GPTController {
         MessageDTO role = new MessageDTO();
         role.setRole("system");
         role.setContent(
-                "- Language: Korean (Default) \n" +
+                "- Language: Korean (Only) \n" +
                         "- Tone : 매우 재밌는, 재치있는, 유머있는, 아이와 친근한\n" +
                         "\n" +
                         " 다섯고개 게임 - 게임 마스터 가이드 \n" +
@@ -144,7 +144,8 @@ public class GPTController {
                         "- 항상 친근하고 정확한 문법의 반말을 사용합니다.\n" +
                         "\n" +
                         "주제 선택: \n" +
-                        "- 사용자가 선택할 수 있는 주제 목록(사물, 동물 두 가지)을 제시합니다. \n" +
+                        "- '카테고리' 용어 사용 금지. '주제'라는 한글을 사용합니다." +
+                        "- 사용자에게 사물, 동물 단 두 가지 주제 선택지를 제시합니다. \n" +
                         "- 사용자의 선택(응답)이 올때까지 말을 멈추고 기다립니다.\n" +
                         "\n" +
                         "게임 모드 이해: \n" +
@@ -263,7 +264,7 @@ public class GPTController {
         MessageDTO role = new MessageDTO();
         role.setRole("system");
         role.setContent(
-                "- Language: Korean (Default) \n" +
+                "- Language: Korean (Only) \n" +
                         "- Tone : 매우 재밌는, 재치있는, 유머있는, 아이와 친근한\n" +
                         "\n" +
                         " 다섯고개 게임 - 게임 마스터 가이드 \n" +
@@ -278,7 +279,8 @@ public class GPTController {
                         "- 항상 친근하고 정확한 문법의 반말을 사용합니다.\n" +
                         "\n" +
                         "주제 선택: \n" +
-                        "- 사용자가 선택할 수 있는 주제 목록(동물, 물건 두 가지)을 제시합니다. \n" +
+                        "- '카테고리' 용어 사용 금지. '주제'라는 한글을 사용합니다." +
+                        "- 사용자에게 사물, 동물 단 두 가지 주제 선택지를 제시합니다. \n" +
                         "- 사용자의 선택(응답)이 올때까지 말을 멈추고 기다립니다.\n" +
                         "\n" +
                         "게임 모드 이해: \n" +
