@@ -176,10 +176,10 @@ public class GPTController {
                         "GPT의 응답 형식은 반드시 JSON이어야 하며, 모두 값을 가져야합니다. 다음과 같아야 합니다:\n" +
                         "{\n" +
                         "  \"message\": \"아이에게 할 메세지\",\n" +
-                        "  \"status\": \"기쁨\", \"아쉬움\", \"놀람\" 중 하나, 다른거 안돼 무조건 이중에 하나야\n" +
-                        "  \"chance\": \"질문할 기회가 몇번 남았는지 예시 (1,2,3)\",\n" +
+                        "  \"chance\": \"질문할 기회가 몇번 남았는지 (예시 : 1,2,3)\",\n" +
                         "  \"isSolved\": 너가 정답을 제시하는지에 대한 여부 (true 또는 false) 너가 정답이 맞는지에 대해 묻는다면 true를 답해줘야해 무조건! \n" +
                         "  \"isEnd\": 게임이 끝났는지 여부 (true 또는 false)\n" +
+                        "  \"status\": \"happy\", \"sad\", \"talkingmouse\" 중 하나, 다른거 안돼 무조건 이중에 하나야\n" +
                         "}"
 
         );
@@ -309,12 +309,13 @@ public class GPTController {
                         "GPT의 응답 형식은 반드시 JSON이어야 하며, 다음과 같아야 합니다:\n" +
                         "{\n" +
                         "  \"message\": \"아이에게 할 메세지\",\n" +
-                        "  \"status\": \"기쁨\", \"아쉬움\", \"놀람\" 중 하나,다른거 안돼 무조건 이중에 하나야\n" +
-                        "  \"chance\": \"질문할 기회가 몇번 남았는지 예시 (1,2,3)\",\n" +
+                        "  \"chance\": \"질문할 기회가 몇번 남았는지 (예시 : 1,2,3)\",\n" +
                         "  \"isSolved\": 정답인지 여부 (true 또는 false)\n" +
                         "  \"isEnd\": 게임이 끝났는지 여부 (true 또는 false)\n" +
+                        "  \"status\": \"isEnd\"=true and \"isSolved\"=true 이면 \"happy\", " +
+                        "              \"isEnd\"=true and \"isSolved\"=false 이면 \"sad\"," +
+                        "              \"isEnd\"=false 이면 \"talkingmouse\" 반환" +
                         "}"
-
         );
 
         messageDTOList.add(role);
