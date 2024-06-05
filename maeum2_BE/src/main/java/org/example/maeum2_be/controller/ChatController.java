@@ -39,19 +39,24 @@ public class ChatController {
     public ApiResponse<?> getChatRoomsByMember(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestParam(defaultValue = "0") int page,
-            @RequestParam(defaultValue = "10") int size) {
+            @RequestParam(defaultValue = "7") int size) {
 
         Pageable pageable = PageRequest.of(page, size);
         Member member = memberRepository.findByMemberId(principalDetails.getMemberId());
         Page<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByMember(member, pageable);
         Page<ChatRoomDTO> chatRoomDTOs = chatRooms.map(chatRoom -> new ChatRoomDTO(chatRoom.getId(), chatRoom.isSolved(), chatRoom.getTimestamp()));
 
+        long totalChatRooms = chatRoomRepository.countChatRoomByMember(member);
+        long solvedChatRooms = chatRoomRepository.countByMemberAndIsSolved(member);
+        int solvedRate = (int) (100 *  solvedChatRooms / totalChatRooms);
+
         Map<String, Object> response = new HashMap<>();
+        response.put("solved_rate",solvedRate);
         response.put("content", chatRoomDTOs.getContent());
         response.put("currentPage", chatRooms.getNumber());
         response.put("totalPages", chatRooms.getTotalPages());
         response.put("totalItems", chatRooms.getTotalElements());
-        response.put("hasNextPage", chatRooms.isLast());
+        response.put("hasNextPage", !chatRooms.isLast());
 
         return ApiResponseGenerator.success(response, HttpStatus.OK);
     }
