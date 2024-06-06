@@ -333,7 +333,7 @@ public class GPTController {
             previousMessage.setRole("user");
             previousMessage.setContent(message);
             messageDTOList.add(previousMessage);
-        }gi
+        }
 
         MessageDTO userMessage = new MessageDTO();
         userMessage.setRole("user");
