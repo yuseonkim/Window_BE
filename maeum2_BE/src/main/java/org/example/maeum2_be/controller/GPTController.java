@@ -155,6 +155,7 @@ public class GPTController {
                         "\n" +
                         "질문 루프: \n" +
                         "- 선택한 주제를 기반으로 예 또는 아니오 질문을 시작합니다. \n" +
+                        "- 가능한 창의적이고 다양한 질문을 합니다. \n" +
                         "- 사용자가 명확하지 않거나 이탈하는 답변을 할 경우, 그에 적절히 대응합니다. \n" +
                         "\n" +
                         "전략 조정: \n" +
@@ -165,7 +166,7 @@ public class GPTController {
                         "- 남은 질문 수가 0이면 더 질문을 하지 않고 최종 추측을 합니다.\n" +
                         "\n" +
                         "최종 추측: \n" +
-                        "- 5번의 질문이 끝나거나 더 일찍 확실한 추측을 할 수 있을 경우, 최종 추측을 합니다. \n" +
+                        "- 5번의 질문이 끝나면, 최종 추측을 합니다. \n" +
                         "- 최종 추측을 할 때는 질문을 마치고 최종 추측을 하겠다고 사용자에게 알려야 합니다.\n" +
                         "\n" +
                         "결과 및 피드백: \n" +
@@ -180,7 +181,7 @@ public class GPTController {
                         "GPT의 응답 형식은 반드시 JSON이어야 하며, 모두 값을 가져야합니다. 다음과 같아야 합니다:\n" +
                         "{\n" +
                         "  \"message\": \"아이에게 할 메세지\",\n" +
-                        "  \"chance\": \"질문할 기회가 몇번 남았는지 (예시 : 1,2,3)\",\n" +
+                        "  \"chance\": \"질문할 기회가 몇번 남았는지 (예시 : 0,1,2,3)\",\n" +
                         "  \"isSolved\": 아이가 정답이라고 했는지에 대한 여부 (true 또는 false) 너가 맞냐고 물어봤는데 아이가 맞았다고 대답 했으면 true야  아니라고 했으면 false야 대답을 하지않았는데 스스로 true라 하면 안돼\n" +
                         "  \"isEnd\": 게임이 끝났는지 여부(너가 더이상 할 말이 없고 마지막 최종추측이 맞았는지 틀렸는지 확실히 인지한 후에 마무리 멘트까지 했으면  true로 해줘)  (true 또는 false)\n" +
                         "  \"status\": \"happy\", \"sad\", \"default\" 중 하나, 다른거 안돼 무조건 이중에 하나야\n" +
@@ -293,6 +294,7 @@ public class GPTController {
                         "\n" +
                         "질문 루프: \n" +
                         "- 선택한 주제를 기반으로 예 또는 아니오 질문을 시작합니다. \n" +
+                        "- 사용자의 질문에 대해 '맞아' 또는 '아니야'라고 답변합니다. \n" +
                         "- 사용자가 명확하지 않거나 이탈하는 질문을 할 경우, 그에 적절히 대응합니다. \n" +
                         "\n" +
                         "전략 조정: \n" +
@@ -302,8 +304,8 @@ public class GPTController {
                         "- 각 답변 후에 현재 질문 번호와 남은 질문 수를 사용자에게 알립니다. \n" +
                         "\n" +
                         "최종 추측: \n" +
-                        "- 5번의 질문이 끝나거나 더 일찍 확실한 추측을 할 수 있을 경우, 사용자는 최종 추측을 합니다.  \n" +
-                        "- AI가 기억하는 것과 사용자의 추측을 비교합니다.\n" +
+                        "- 5번째 질문에 대한 답변이 끝나면, 사용자가 최종 추측을 하도록 합니다.  \n" +
+                        "- AI가 기억하는 것과 사용자의 최종 추측을 비교합니다.\n" +
                         "- 처음으로 답이 틀렸을 경우 2번의 질문 기회를 더 줍니다.\n" +
                         "- 두번째로 답이 틀렸을 경우 사용자는 정답을 맞추지 못한 것입니다.\n" +
                         "\n" +
@@ -324,7 +326,6 @@ public class GPTController {
                         "              \"isEnd\"=false 이면 \"default\" 반환" +
                         "}"
         );
-
         messageDTOList.add(role);
 
         for (String message : previousConversations) {
@@ -332,7 +333,7 @@ public class GPTController {
             previousMessage.setRole("user");
             previousMessage.setContent(message);
             messageDTOList.add(previousMessage);
-        }
+        }gi
 
         MessageDTO userMessage = new MessageDTO();
         userMessage.setRole("user");
