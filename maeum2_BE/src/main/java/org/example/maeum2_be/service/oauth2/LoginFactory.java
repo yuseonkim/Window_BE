@@ -39,11 +39,6 @@ public class LoginFactory {
             return ApiResponseGenerator.success(new LoginDTO(false,member.getMemberId()),HttpStatus.OK);
         }
         String jwt = jwtTokenCreator.execute(member);
-        PrincipalDetails principalDetails = new PrincipalDetails(member);
-        Authentication authentication = new UsernamePasswordAuthenticationToken(principalDetails, null,
-                principalDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
         response.setContentType("application/json");
         // 토큰을 HTTP 헤더에 추가
         response.addHeader("Authorization", jwt);

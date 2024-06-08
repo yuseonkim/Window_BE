@@ -23,7 +23,7 @@ public class ChatRoom {
 
     @Setter
     @Column
-    private boolean isSolved;
+    private int isSolved;
 
     @OneToMany(mappedBy = "chatRoom")
     private List<Chat> chats;
@@ -34,6 +34,10 @@ public class ChatRoom {
 
     @CreatedDate
     private LocalDateTime timestamp;
+
+    public void setSolved(int status){
+        this.isSolved = status;
+    }
 
     public ChatRoom(Member member, LocalDateTime now) {
         this.member = member;
