@@ -414,4 +414,133 @@ public class GPTController {
 
         return ApiResponseGenerator.success(textResponseDTOList, HttpStatus.OK);
     }
+
+
+    @PostMapping("/api/main/gpt3")  // 같은 글자로 끝나는 말 찾기
+    public ApiResponse<?> processGPT3(@RequestBody UserInputDTO userInputDTO,
+                                      @AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
+        String userInput = userInputDTO.getUserInput(); // 사용자의 입력.
+        String userName = principalDetails.getUsername();
+
+        // Redis에서 이전 대화 기록을 가져옴
+        List<String> previousConversations = conversationRepository.getConversations(userId);
+
+        // 현재 사용자 입력을 Redis에 저장
+        conversationRepository.save(userId, userInput);
+
+        // GPT에게 전달할 메시지 구성
+        List<MessageDTO> messageDTOList = new ArrayList<>();
+        MessageDTO role = new MessageDTO();
+        role.setRole("system");
+        role.setContent(
+                "- Language: Korean (Only) \n" +
+                        "- Tone : 매우 재밌는, 재치있는, 유머있는, 아이와 친근한\n" +
+                        "\n" +
+                        "같은 글자로 끝나는 명사 단어 찾기 놀이 - 놀이 치료사 가이드\n" +
+                        "- 역할: 너는 ASD아동의 놀이 치료사이다. 같은 글자로 끝나는 명사 단어를 찾는 놀이를 한다.\n" +
+                        "- 목표: 같은 글자로 끝나는 명사 단어를 찾는 놀이를 만든다.\n" +
+                        "- 함께 게임을 할 사용자 이름은 userName 이다. \n" +
+                        "- 말을 간결하게 한다. 같은 문장 표현을 재사용하지 않는다.\n" +
+                        "\n" +
+                        "- 응답 형식: 반드시 JSON이어야 하며, 다음과 같아야 한다.\n" +
+                        "예시 :\n" +
+                        "{\n" +
+                        "  \"message\": 사용자에게 할 메세지\n" +
+                        "  \"status\": happy, sad, default 중 하나\n" +
+                        "  \"number\": 사용자가 단어를 제시한 횟수\n" +
+                        "  \"isEed\": 놀이 종료 여부 (true 또는 false)\n" +
+                        "  \"endBy\": 종료 주체가 누구인지 (사용자 또는 gpt, default=null)\n" +
+                        "}\n" +
+                        "\n" +
+                        "1. 놀이 시작: \n" +
+                        "-" + userName + "과 친절한 인사로 시작한다.\n" +
+                        "- 친근하고 정확한 문법의 반말을 사용한다. 반드시 반말만 사용한다.\n" +
+                        "\n" +
+                        "2. 같아야 할 마지막 글자 정하기:\n" +
+                        "- 사용자가 놀이에 사용될 마지막 글자를 정한다.\n" +
+                        "\n" +
+                        "3. 놀이 루프:\n" +
+                        "- 자신이 잘못된 단어를 말할 수도 있으니, 틀리면 알려줘! 라고 먼저 알린다." +
+                        "- 사용자 정한 마지막 글자로 끝나는 단어를 차례로 말한다.\n" +
+                        "예시: 마지막 글자 '장' - 운동장, 단어장, 새우장, 간장, 된장 등\n" +
+                        "사용자에게 예시는 되도록 제공하지 않는다." +
+                        "- 항상 사용자가 먼저 제시하고, 다음 차례에 GPT가 제시한다.\n" +
+                        "- 사용자가 명확하지 않거나 이탈하는 답변을 할 경우, 그에 적절히 대응한다.\n" +
+                        "- 반드시 띄어 쓰기가 없는 한 단어만 제시한다. 서술어도 허용하지 않는다.\n" +
+                        "- 반드시 사용자의 답변과 GPT의 답변이 실제로 존재하는 단어인지 사전에 검색하여 확인한다.\n" +
+                        "- 사용자의 답변이 GPT의 답변과 중복되지 않는지 확인한다.\n" +
+                        "- GPT의 답변이 사용자의 답변과 중복되지 않도록한다." +
+                        "- GPT나 사용자가 더 이상 단어를 제시할 수 없는 경우 놀이를 끝낸다.\n" +
+                        "\n" +
+                        "4. 횟수 기록:\n" +
+                        "- 사용자가 단어를 제시한 횟수를 기록한다.\n" +
+                        "\n" +
+                        "5. 놀이 종료:\n" +
+                        "- 사용자가 더 이상 단어를 제시할 수 없어 놀이를 끝낸 경우: 사용자가 단어를 제시한 횟수를 알려주고, 평균보다 많이 알고 있으면 칭찬한다.\n" +
+                        "- GPT가 더 이상 단어를 제시할 수 없어 놀이를 끝낸 경우: 사용자에게 어떤 단어가 더 있는지 물어본다.\n" +
+                        "\n" +
+                        "6. 마무리 인사:\n" +
+                        "- '놀이 종료' 대화가 끝나면 마무리 인사를 나눈다."
+        );
+        messageDTOList.add(role);
+
+        for (String message : previousConversations) {
+            MessageDTO previousMessage = new MessageDTO();
+            previousMessage.setRole("user");
+            previousMessage.setContent(message);
+            messageDTOList.add(previousMessage);
+        }
+
+        MessageDTO userMessage = new MessageDTO();
+        userMessage.setRole("user");
+        userMessage.setContent(userInput);
+        messageDTOList.add(userMessage);
+
+        // GPT 요청 구성
+        GPTRequestDTO requestDTO = new GPTRequestDTO();
+        requestDTO.setMessages(messageDTOList);
+        requestDTO.setModel("gpt-4o");
+
+        // GPT 처리
+        GPTResponseDTO gptResponse = gptService.getResponse(requestDTO);
+        List<Text3ResponseDTO> text3ResponseDTOList = new ArrayList<>();
+
+        // JSON 파싱
+        ObjectMapper objectMapper = new ObjectMapper();
+        for (ChoiceDTO choice : gptResponse.getChoices()) {
+            try {
+                // JSON 형식만 남기기 위해 '{'의 위치를 찾고 자름
+                String content = choice.getMessage().getContent();
+                int jsonStartIndex = content.indexOf('{');
+                if (jsonStartIndex != -1) {
+                    content = content.substring(jsonStartIndex);
+
+                    JsonNode jsonNode = objectMapper.readTree(content);
+                    String message = jsonNode.path("message").asText();
+                    String status = jsonNode.path("status").asText();
+                    String number = jsonNode.path("number").asText();
+                    boolean isEnd = jsonNode.path("isEnd").asBoolean();
+                    String endBy = jsonNode.path("endBy").asText();
+                    text3ResponseDTOList.add(new Text3ResponseDTO(message, status, number, isEnd, endBy));
+                } else {
+                    // JSON 형식을 찾지 못한 경우 로그 출력
+                    System.out.println("Invalid JSON response: " + content);
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        // 받은 답변을 Redis에 저장
+        for (Text3ResponseDTO response : text3ResponseDTOList) {
+            conversationRepository.save(userId, response.getMessage());
+        }
+
+        // 클라이언트로 전송
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return ApiResponseGenerator.success(text3ResponseDTOList, HttpStatus.OK);
+    }
 }
