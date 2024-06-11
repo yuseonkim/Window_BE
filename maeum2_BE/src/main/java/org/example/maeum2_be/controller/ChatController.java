@@ -50,7 +50,7 @@ public class ChatController {
         long solvedChatRooms = chatRoomRepository.countByMemberAndIsSolved(member);
         long aiChatRooms = chatRoomRepository.countByMemberAndAI(member);
         int solvedRate;
-        if(totalChatRooms == 0){
+        if(totalChatRooms == 0 || solvedChatRooms == 0){
             solvedRate = 0;
         }else {
             solvedRate = (int) (100 * solvedChatRooms / (totalChatRooms - aiChatRooms));
@@ -68,7 +68,7 @@ public class ChatController {
     }
 
 
-    @GetMapping("/api/chats/detail")
+    @PostMapping("/api/chats/detail")
     public ApiResponse<?> getChatRoomsDetails(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestBody ChatRequestDTO chatRequestDTO,
