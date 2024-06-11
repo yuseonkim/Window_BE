@@ -44,11 +44,17 @@ public class ChatController {
         Pageable pageable = PageRequest.of(page, size);
         Member member = memberRepository.findByMemberId(principalDetails.getMemberId());
         Page<ChatRoom> chatRooms = chatRoomRepository.findChatRoomsByMember(member, pageable);
-        Page<ChatRoomDTO> chatRoomDTOs = chatRooms.map(chatRoom -> new ChatRoomDTO(chatRoom.getId(), chatRoom.isSolved(), chatRoom.getTimestamp()));
+        Page<ChatRoomDTO> chatRoomDTOs = chatRooms.map(chatRoom -> new ChatRoomDTO(chatRoom.getId(), chatRoom.getIsSolved(), chatRoom.getTimestamp()));
 
         long totalChatRooms = chatRoomRepository.countChatRoomByMember(member);
         long solvedChatRooms = chatRoomRepository.countByMemberAndIsSolved(member);
-        int solvedRate = (int) (100 *  solvedChatRooms / totalChatRooms);
+        long aiChatRooms = chatRoomRepository.countByMemberAndAI(member);
+        int solvedRate;
+        if(totalChatRooms == 0 || solvedChatRooms == 0){
+            solvedRate = 0;
+        }else {
+            solvedRate = (int) (100 * solvedChatRooms / (totalChatRooms - aiChatRooms));
+        }
 
         Map<String, Object> response = new HashMap<>();
         response.put("solved_rate",solvedRate);
@@ -62,7 +68,7 @@ public class ChatController {
     }
 
 
-    @GetMapping("/api/chats/detail")
+    @PostMapping("/api/chats/detail")
     public ApiResponse<?> getChatRoomsDetails(
             @AuthenticationPrincipal PrincipalDetails principalDetails,
             @RequestBody ChatRequestDTO chatRequestDTO,

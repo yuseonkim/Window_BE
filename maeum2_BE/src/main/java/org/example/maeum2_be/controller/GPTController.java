@@ -68,7 +68,7 @@ public class GPTController {
 
         // ChatRoom 생성 또는 조회
         ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
-        chatRoom.setSolved(true);
+        chatRoom.setSolved(0);
         chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
 
         // Redis에서 이전 대화 기록을 가져옴
@@ -98,7 +98,35 @@ public class GPTController {
 
         // ChatRoom 생성 또는 조회
         ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
-        chatRoom.setSolved(false);
+        chatRoom.setSolved(1);
+        chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
+
+        // Redis에서 이전 대화 기록을 가져옴
+        List<String> previousConversations = conversationRepository.getConversations(userId);
+        // 대화 내용을 Chat 엔티티로 저장
+        for (String text : previousConversations) {
+            Chat chat = new Chat(chatRoom,text);
+            chatRepository.save(chat);
+        }
+        // 이전 대화 기록 삭제
+        conversationRepository.delete(userId);
+        return ApiResponseGenerator.success(HttpStatus.OK);
+    }
+
+    @GetMapping("/api/main/ai")
+    public ApiResponse<?> saveAiGameGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
+        String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
+
+        // 사용자(Member) 조회
+        Member member = new Member(); // 사용자 객체를 조회하는 로직 필요
+        member = memberRepository.findByMemberId(userId);
+        if (member == null) {
+            throw new MemberNotFoundException(MessageCode.MEMBER_NOT_FOUND);
+        }
+
+        // ChatRoom 생성 또는 조회
+        ChatRoom chatRoom = new ChatRoom(member, LocalDateTime.now());
+        chatRoom.setSolved(2);
         chatRoom = chatRoomRepository.save(chatRoom); // ChatRoom 저장
 
         // Redis에서 이전 대화 기록을 가져옴

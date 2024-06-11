@@ -1,10 +1,7 @@
 package org.example.maeum2_be.entity.domain;
 
 
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
+import lombok.*;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
 
@@ -12,7 +9,7 @@ import javax.persistence.*;
 import java.time.LocalDate;
 
 
-@Getter
+@Data
 @NoArgsConstructor
 @Entity
 @Table

@@ -17,7 +17,7 @@ public class ChatRoomDTO {
     Long id;
 
     @JsonProperty("isSolved")
-    boolean isSolved;
+    int isSolved;
 
     @JsonProperty("date")
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "yyyy-MM-dd")
@@ -27,7 +27,7 @@ public class ChatRoomDTO {
     @JsonFormat(shape = JsonFormat.Shape.STRING, pattern = "HH:mm:ss")
     LocalTime time;
 
-    public ChatRoomDTO(Long id, boolean isSolved, LocalDateTime localDateTime) {
+    public ChatRoomDTO(Long id, int isSolved, LocalDateTime localDateTime) {
         this.id = id;
         this.isSolved = isSolved;
         this.date = localDateTime.toLocalDate();
