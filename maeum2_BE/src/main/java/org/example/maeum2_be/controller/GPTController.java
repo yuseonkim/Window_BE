@@ -44,7 +44,6 @@ public class GPTController {
     @GetMapping("/api/main/quit")
     public ApiResponse<?> quitGPT(@AuthenticationPrincipal PrincipalDetails principalDetails) {
         String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
-
         // Redis에서 이전 대화 기록을 가져옴
         List<String> previousConversations = conversationRepository.getConversations(userId);
 
@@ -145,6 +144,7 @@ public class GPTController {
         String userId =  principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
         String userInput = userInputDTO.getUserInput(); // 사용자의 입력.
         String userName = principalDetails.getUsername();
+        String userBirth = memberRepository.findByMemberId(userId).getChildBirth().toString();
 
         // Redis에서 이전 대화 기록을 가져옴
         List<String> previousConversations = conversationRepository.getConversations(userId);
@@ -164,7 +164,8 @@ public class GPTController {
                         "역할: 너는 다섯고개 게임의 게임 마스터이다. 초등학교 저학년 수준의 아이와 게임을 한다.\n" +
                         " \n" +
                         "목표: 사용자가 생각하는 사물, 동물을 추측하기 위해 예 또는 아니오 질문으로 이끄는 다섯고개 게임을 만듭니다. \n" +
-                        "사용자의 이름은 " + userName + "이다. \n" +
+                        "사용자의 이름은 " + userName + "이고 나이는"+ userBirth+"야. \n" +
+                        "나이를 고려해서 퀴즈를 내줘"+
                         "\n" +
                         "ChatGPT 지침: \n" +
                         "게임 시작: \n" +
@@ -284,6 +285,7 @@ public class GPTController {
         String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
         String userInput = userInputDTO.getUserInput(); // 사용자의 입력.
         String userName = principalDetails.getUsername();
+        String userBirth = memberRepository.findByMemberId(userId).getChildBirth().toString();
 
         // Redis에서 이전 대화 기록을 가져옴
         List<String> previousConversations = conversationRepository.getConversations(userId);
@@ -303,7 +305,8 @@ public class GPTController {
                         "역할: 너는 다섯고개 게임의 게임 마스터이다. 초등학교 저학년 수준의 아이와 게임을 한다.\n" +
                         " \n" +
                         "목표: AI가 생각하는 사물, 동물을 추측하기 위해 사용자가 예 또는 아니오 질문을 하는 다섯고개 게임을 만듭니다. \n" +
-                        "사용자의 이름은 " + userName + "이다. \n" +
+                        "사용자의 이름은 " + userName + "이고 나이는"+ userBirth+"야. \n" +
+                        "나이를 고려해서 퀴즈를 내줘"+
                         "\n" +
                         " ChatGPT 지침: \n" +
                         "게임 시작: \n" +
@@ -422,6 +425,7 @@ public class GPTController {
         String userId = principalDetails.getMemberId(); // 사용자의 ID를 받아온다고 가정합니다.
         String userInput = userInputDTO.getUserInput(); // 사용자의 입력.
         String userName = principalDetails.getUsername();
+        String userBirth = memberRepository.findByMemberId(userId).getChildBirth().toString();
 
         // Redis에서 이전 대화 기록을 가져옴
         List<String> previousConversations = conversationRepository.getConversations(userId);
@@ -440,7 +444,7 @@ public class GPTController {
                         "같은 글자로 끝나는 명사 단어 찾기 놀이 - 놀이 치료사 가이드\n" +
                         "- 역할: 너는 ASD아동의 놀이 치료사이다. 같은 글자로 끝나는 명사 단어를 찾는 놀이를 한다.\n" +
                         "- 목표: 같은 글자로 끝나는 명사 단어를 찾는 놀이를 만든다.\n" +
-                        "- 함께 게임을 할 사용자 이름은 userName 이다. \n" +
+                        "- 함께 게임을 할 사용자 이름은"+userName+" 이다. \n" +
                         "- 말을 간결하게 한다. 같은 문장 표현을 재사용하지 않는다.\n" +
                         "\n" +
                         "- 응답 형식: 반드시 JSON이어야 하며, 다음과 같아야 한다.\n" +
@@ -455,6 +459,8 @@ public class GPTController {
                         "\n" +
                         "1. 놀이 시작: \n" +
                         "-" + userName + "과 친절한 인사로 시작한다.\n" +
+                        "사용자의 이름은 " + userName + "이고 나이는"+ userBirth+"야. \n" +
+                        "나이를 고려해서 퀴즈를 내줘"+
                         "- 친근하고 정확한 문법의 반말을 사용한다. 반드시 반말만 사용한다.\n" +
                         "\n" +
                         "2. 같아야 할 마지막 글자 정하기:\n" +

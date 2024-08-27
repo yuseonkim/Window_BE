@@ -9,5 +9,5 @@ import lombok.RequiredArgsConstructor;
 @AllArgsConstructor
 public class GuardianInformation {
     private String key;
-    private String value;
+    private String data;
 }
